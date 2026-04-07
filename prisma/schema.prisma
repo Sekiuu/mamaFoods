@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model foods {
+  id          Int       @id @default(autoincrement())
+  name        String?
+  price       String?
+  description String?
+  icon        String?
+  last_edit   DateTime? @db.Timestamptz(6)
+}
+model orders {
+  id         Int       @id @default(autoincrement())
+  customer_phone String?
+  customer_name String?
+  customer_address String?
+  customer_note String?
+  items      String?   // JSON string of cart items
+  total_price String?
+  status     String?   // e.g., "pending", "completed", "cancelled"
+  create_at  DateTime? @db.Timestamptz(6)
+}
+model users {
+  id        Int       @id @default(autoincrement())
+  name      String?
+  password  String?
+  create_at DateTime? @db.Timestamptz(6)
+}
