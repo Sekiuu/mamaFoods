@@ -116,12 +116,12 @@ import type { CartItem, CustomerInfo } from '~/types'
 import { OrderStatus } from '~/types/orders';
 
 definePageMeta({
-    middleware: 'auth-card'
+    middleware: 'auth-cart'
 });
 
-const CART_KEY = 'mamaFoodCart'
-const CUSTOMER_INFO_KEY = 'mamaFoodCustomerInfo'
-const ORDER_IDS_COOKIE = 'mamaFoodOrderIds'
+const CART_KEY = process.env.CART_KEY || 'mamaFoodCart'
+const CUSTOMER_INFO_KEY = process.env.CUSTOMER_INFO_KEY || 'mamaFoodCustomerInfo'
+const ORDER_IDS_COOKIE = process.env.ORDER_IDS_COOKIE || 'mamaFoodOrderIds'
 
 const router = useRouter()
 const orderIdsCookie = useCookie<number[]>(ORDER_IDS_COOKIE, {

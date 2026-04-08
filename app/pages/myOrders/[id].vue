@@ -40,7 +40,7 @@ const loading = ref(true)
 const loadOrder = async (isPolling = true) => {
     const id = Number(route.params.id)
     if (!id) {
-        router.push('/myOrder')
+        router.push('/myOrders')
         return
     }
 

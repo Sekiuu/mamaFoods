@@ -93,7 +93,7 @@
 
 <script setup lang="ts">
 
-const CART_KEY = 'mamaFoodCart'
+const CART_KEY = process.env.CART_KEY || 'mamaFoodCart'
 const router = useRouter()
 const loading = ref(false)
 interface MenuItem {
