@@ -26,9 +26,13 @@
             <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-10">
                 <!-- Menu Items Section-->
                 <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div v-for="item in menuItems" :key="item.id"
+                    <div v-if="menuItems.length > 0" v-for="item in menuItems" :key="item.id"
                         class="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
                         <FoodCard :item="item" :addToCart="addToCart" />
+                    </div>
+                <!-- in case of empty menu -->
+                    <div v-else class="rounded-3xl bg-white p-10 shadow-sm border border-gray-100 text-center">
+                        <p class="text-gray-500">No items found.</p>
                     </div>
                 </div>
 
@@ -88,8 +92,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 
 const CART_KEY = 'mamaFoodCart'
 const router = useRouter()

@@ -1,4 +1,7 @@
-import {prisma} from "../../../prisma/db";
+import { getPrismaClient } from '../../utils/prisma'
+
+const prisma = getPrismaClient()
+
 export default defineEventHandler(async (event) => {
     if (event.req.method === "GET") {
         // Get all foods

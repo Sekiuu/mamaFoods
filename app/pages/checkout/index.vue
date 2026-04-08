@@ -112,9 +112,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import type { CartItem, CustomerInfo } from '../../types'
+import type { CartItem, CustomerInfo } from '~/types'
 import { OrderStatus } from '~/types/orders';
 
 definePageMeta({

@@ -86,7 +86,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
 import FoodForm from '~/components/admin/FoodForm.vue'
 import FoodListTable from '~/components/admin/FoodListTable.vue'
 import FoodDelete from '~/components/admin/FoodDelete.vue'

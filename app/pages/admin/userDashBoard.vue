@@ -1,11 +1,11 @@
 <template>
-        <PageHeader title="Order Dashboard" :enable-logout="false">
-            <template #actions>
-                <NuxtLink to="/admin" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md mr-4">
-                    Back to Dashboard
-                </NuxtLink>
-            </template>
-        </PageHeader>
+    <PageHeader title="Order Dashboard" :enable-logout="false">
+        <template #actions>
+            <NuxtLink to="/admin" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md mr-4">
+                Back to Dashboard
+            </NuxtLink>
+        </template>
+    </PageHeader>
     <div class="admin-dashboard">
         <div class="container mx-auto px-4 py-8">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -62,7 +62,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
 import UserForm from "~/components/admin/UserForm.vue";
 import UserListTable from "~/components/admin/UserListTable.vue";
 import UserDelete from "~/components/admin/UserDelete.vue";
