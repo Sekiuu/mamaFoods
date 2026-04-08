@@ -28,11 +28,7 @@
 
 <script setup lang="ts">
 
-import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { t } from 'vue-router/dist/index-BzEKChPW.js'
 import type { Order } from '~/types'
-import { OrderStatus } from '~/types/orders'
 
 const poolingInterval = 3000 //3 seconds
 let timer: any = null;

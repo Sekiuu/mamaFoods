@@ -51,7 +51,6 @@
 
 <script setup lang="ts">
 import { useOrderManagement } from '~/composables/useOrderManagement'
-import { useAdminAuth } from '~/composables/useAdminAuth'
 import PageHeader from '~/components/admin/PageHeader.vue'
 import OrderManager from '~/components/admin/OrderManager.vue'
 import OrderCrud from '~/components/admin/OrderCrud.vue'

@@ -29,11 +29,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
 import { useCookie } from '#imports'
 import type { Order } from '~/types'
 import { OrderStatus } from '~/types/orders'
-import { useRouter } from 'vue-router'
 const router = useRouter()
 
 const orderIdsCookie = useCookie<number[]>('mamaFoodOrderIds', {
