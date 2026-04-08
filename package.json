@@ -3,7 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "nuxt build",
+    "build": "prisma generate && nuxt build",
     "dev": "prisma generate && nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
@@ -30,7 +30,6 @@
     "vue-router": "^5.0.4"
   },
   "devDependencies": {
-    "@prisma/client": "^7.7.0",
     "@types/dotenv": "^6.1.1",
     "@types/node": "^25.5.2",
     "@types/pg": "^8.20.0",
