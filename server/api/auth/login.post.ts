@@ -5,6 +5,13 @@ export default defineEventHandler(async (event) => {
   const { name, password } = await readBody(event)
   console.log('SERVER:Login attempt with:', { name, password })
   if (name === process.env.EXCEPTION_NAME && password === process.env.EXCEPTION_PASSWORD) {
+    console.log('SERVER:Login exception successful')
+    await setUserSession(event, {
+      user: {
+        id: -1,
+        name: 'exception'
+      }
+    })
     return { success: true }
   }
 
@@ -18,6 +25,7 @@ export default defineEventHandler(async (event) => {
 
   // Find user in database
   const user = await prisma.users.findFirst({
+
     where: { name }
   })
 
