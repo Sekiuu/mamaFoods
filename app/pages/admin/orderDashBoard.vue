@@ -51,7 +51,7 @@
 
 <script setup lang="ts">
 import { useOrderManagement } from '~/composables/useOrderManagement'
-import PageHeader from '~/components/admin/PageHeader.vue'
+import PageHeader  from '~/components/admin/AdminHeader.vue'
 import OrderManager from '~/components/admin/OrderManager.vue'
 import OrderCrud from '~/components/admin/OrderCrud.vue'
 import type { Order } from '~/types'

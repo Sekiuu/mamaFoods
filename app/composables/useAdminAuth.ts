@@ -5,11 +5,10 @@ export const useAdminAuth = () => {
         })
         await navigateTo('/admin/login')
     }
-    const session = async () => (await $fetch('/api/auth/session'))
+    const session = useUserSession()
 
     return {
         session,
         logout,
-        isAuthenticated: computed(() => !!session().then(res => res?.user))
     }
 }

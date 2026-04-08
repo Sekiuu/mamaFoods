@@ -1,6 +1,6 @@
 <template>
     <div class="food-list-container">
-        <h2 class="text-2xl font-bold mb-4">Food Items</h2>
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Food Items</h2>
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white border-collapse border border-gray-300">
                 <thead class="bg-gray-200">

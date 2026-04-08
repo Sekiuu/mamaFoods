@@ -3,17 +3,20 @@
         <div class="max-w-2xl mx-auto">
             <!-- Header -->
             <div class="text-center mb-8">
-                <h1 class="text-4xl font-extrabold text-gray-900 mb-2">Checkout</h1>
-                <p class="text-gray-600">Review your order and complete your purchase</p>
+                <p class="text-gray-600">
+                    {{ $t('checkout.subtitle') }}
+                </p>
             </div>
 
             <!-- Order Summary -->
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 mb-8">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">Order Summary</h2>
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                    {{ $t('checkout.orderSummary.title') }}
+                </h2>
 
                 <!-- Order Items -->
                 <div class="space-y-4 mb-8">
-                    <div v-for="item in cart" :key="item.id"
+                    <div v-for="item in cartItems" :key="item.id"
                         class="flex justify-between items-center py-4 border-b border-gray-100 last:border-b-0">
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-2xl">
@@ -32,35 +35,53 @@
                 </div>
 
                 <!-- Order Total -->
-                <div class="border-t border-gray-200 pt-6">
+                <div class="border-t border-gray-200 pt-6 text-gray-800">
                     <div class="flex justify-between items-center text-xl font-bold">
-                        <span>Total Amount</span>
-                        <span class="text-orange-600 font-mono">฿{{ totalPrice }}</span>
+                        <span>
+                            {{ $t('checkout.orderSummary.total') }}
+                        </span>
+                        <span class="text-orange-600 font-mono">
+                            ฿{{ totalPrice }}
+                        </span>
                     </div>
                     <div class="flex justify-between items-center text-sm text-gray-500 mt-1">
-                        <span>Total Items</span>
-                        <span>{{ totalItems }}</span>
+                        <span>
+                            {{ $t('checkout.orderSummary.totalItems') }}
+                        </span>
+                        <span>
+                            {{ totalItems }}
+                        </span>
                     </div>
                 </div>
             </div>
 
             <!-- Customer Information Form (Optional) -->
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 mb-8">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">Customer Information</h2>
-
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                    {{ $t('customerInfo.title') }}
+                </h2>
+                <!-- Success/Error Messages -->
+                <div v-if="message.text"
+                    :class="message.type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700'"
+                    class="my-6 p-4 border rounded-xl">
+                    {{ message.text }}
+                </div>
+                <!-- Customer Information Form-->
                 <form @submit.prevent="confirmOrder" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Full Name <span class="text-red-500">*</span>
+                                {{ $t('customerInfo.name') }}
+                                <span class="text-red-500">*</span>
                             </label>
-                            <input v-model="customerInfo.name" type="text" required placeholder="Enter your full name"
+                            <input v-model="customerInfo.name" type="name" required placeholder="Enter your full name"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent" />
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Phone Number <span class="text-red-500">*</span>
+                                {{ $t('customerInfo.phone') }}
+                                <span class="text-red-500">*</span>
                             </label>
                             <input v-model="customerInfo.phone" type="tel" required
                                 placeholder="Enter your phone number"
@@ -70,7 +91,8 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Delivery Address <span class="text-red-500">*</span>
+                            {{ $t('customerInfo.address') }}
+                            <span class="text-red-500">*</span>
                         </label>
                         <textarea v-model="customerInfo.address" required rows="3"
                             placeholder="Enter your delivery address"
@@ -79,7 +101,7 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Special Instructions (Optional)
+                            {{ $t('customerInfo.note') }}
                         </label>
                         <textarea v-model="customerInfo.instructions" rows="2"
                             placeholder="Any special requests or instructions..."
@@ -95,17 +117,10 @@
                     Cancel Order
                 </button>
 
-                <button @click="confirmOrder" :disabled="isProcessing || !isFormValid"
+                <button @click="confirmOrder" :disabled="isProcessing"
                     class="flex-1 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 text-white font-semibold py-4 px-6 rounded-2xl transition-all shadow-lg disabled:cursor-not-allowed">
                     {{ isProcessing ? 'Processing...' : 'Confirm Order' }}
                 </button>
-            </div>
-
-            <!-- Success/Error Messages -->
-            <div v-if="message.text"
-                :class="message.type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700'"
-                class="mt-6 p-4 border rounded-xl">
-                {{ message.text }}
             </div>
         </div>
     </div>
@@ -114,10 +129,11 @@
 <script setup lang="ts">
 import type { CartItem, CustomerInfo } from '~/types'
 import { OrderStatus } from '~/types/orders';
-
+import { useCustomerInfoValidate } from '~/composables/useCustomerInfoValidate'
+import { useToast } from '#imports';
 definePageMeta({
-    middleware: 'auth-cart'
-});
+    middleware: ['auth-cart']
+})
 
 const CART_KEY = process.env.CART_KEY || 'mamaFoodCart'
 const CUSTOMER_INFO_KEY = process.env.CUSTOMER_INFO_KEY || 'mamaFoodCustomerInfo'
@@ -128,8 +144,11 @@ const orderIdsCookie = useCookie<number[]>(ORDER_IDS_COOKIE, {
     default: () => [],
     maxAge: 60 * 60 * 24 * 30,
 })
+const cartItemsCookie = useCookie<CartItem[] | null>(CART_KEY)
+const customerInfoCookie = useCookie<CustomerInfo | null>(CUSTOMER_INFO_KEY)
 
-const cart = ref<CartItem[]>([])
+const cartItems = ref<CartItem[] | null>([])
+
 const isProcessing = ref(false)
 const message = ref({ text: '', type: '' })
 
@@ -141,51 +160,45 @@ const customerInfo = ref<CustomerInfo>({
 })
 
 onMounted(() => {
-    const savedCart = localStorage.getItem(CART_KEY)
-    if (savedCart) {
-        try {
-            cart.value = JSON.parse(savedCart)
-        } catch (error) {
-            console.error('Error loading cart:', error)
-        }
+    if (cartItemsCookie.value) {
+        cartItems.value = cartItemsCookie.value
     }
 
-    const savedCustomerInfo = localStorage.getItem(CUSTOMER_INFO_KEY)
-    if (savedCustomerInfo) {
-        try {
-            customerInfo.value = JSON.parse(savedCustomerInfo)
-        } catch (error) {
-            console.error('Error loading customer info:', error)
-        }
-    }
-
-    if (cart.value.length === 0) {
-        router.push('/order')
+    if (customerInfoCookie.value != null) {
+        customerInfo.value = customerInfoCookie.value
     }
 })
 
 const totalItems = computed((): number => {
-    return cart.value.reduce((sum, item) => sum + (item.quantity || 0), 0)
+    return cartItems.value ? cartItems.value.reduce((sum, item) => sum + (item.quantity || 0), 0) : 0
 })
 const totalPrice = computed((): number => {
-    return cart.value.reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 0)), 0)
+    return cartItems.value ? cartItems.value.reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 0)), 0) : 0
 })
 
-const isFormValid = computed(() => {
-    return (
-        customerInfo.value.name.trim() &&
-        customerInfo.value.phone.trim() &&
-        customerInfo.value.address.trim()
-    )
-})
+const { isFormValid, errors } = useCustomerInfoValidate(customerInfo);
 
 const cancelOrder = () => {
-    localStorage.removeItem(CART_KEY)
+    cartItemsCookie.value = null
     router.push('/shop')
 }
 
 const confirmOrder = async () => {
-    if (!isFormValid.value) return
+    if (!isFormValid.value) {
+        useToast().add(
+            {
+                title: 'Please fill in all required fields.',
+                description: errors.value.name || errors.value.phone || errors.value.address,
+                color: 'error',
+                class: 'bg-red-200',
+            }
+        )
+        message.value = {
+            text: errors.value.name || errors.value.phone || errors.value.address,
+            type: 'error',
+        }
+        return
+    }
 
     isProcessing.value = true
     message.value = { text: '', type: '' }
@@ -196,7 +209,7 @@ const confirmOrder = async () => {
             customer_phone: customerInfo.value.phone,
             customer_address: customerInfo.value.address,
             customer_note: customerInfo.value.instructions,
-            items: cart.value,
+            items: cartItems.value,
             total_price: totalPrice.value,
             status: OrderStatus.Pending,
         }
@@ -206,16 +219,22 @@ const confirmOrder = async () => {
             body: payload,
         }) as any
 
-        const existingIds = Array.isArray(orderIdsCookie.value)
-            ? orderIdsCookie.value
-            : orderIdsCookie.value
-                ? JSON.parse(orderIdsCookie.value as unknown as string)
-                : []
+        // อัปเดตรายการ Order ID ใน Cookie
+        orderIdsCookie.value = Array.from(new Set([...orderIdsCookie.value, order.id]))
+        // ล้างข้อมูลตะกร้าใน Cookie
+        cartItemsCookie.value = null
+        // Save customer info to cookie
+        customerInfoCookie.value = customerInfo.value
 
-        orderIdsCookie.value = Array.from(new Set([...existingIds, order.id]))
-
-        localStorage.setItem(CUSTOMER_INFO_KEY, JSON.stringify(customerInfo.value))
-        localStorage.removeItem(CART_KEY)
+        console.log('Order placed successfully!',
+            customerInfoCookie.value,
+            cartItemsCookie.value,
+            orderIdsCookie.value)
+        // แสดงข้อความสำเร็จ
+        message.value = {
+            text: 'Order placed successfully!',
+            type: 'success',
+        }
 
         router.push(`/myOrders/${order.id}`)
     } catch (error) {
@@ -227,8 +246,8 @@ const confirmOrder = async () => {
         isProcessing.value = false
     }
 }
+onUnmounted(() => {
+    // บันทึกข้อมูลลูกค้าลงใน Cookie เมื่อออกจากหน้า
+    customerInfoCookie.value = customerInfo.value
+})
 </script>
-
-<style scoped>
-/* Additional custom styles if needed */
-</style>

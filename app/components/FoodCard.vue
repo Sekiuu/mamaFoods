@@ -16,7 +16,7 @@ const props = defineProps<{
         <!-- food image-->
         <div class="h-48 overflow-hidden bg-gray-200 relative">
             <div class="w-full h-full flex items-center justify-center text-gray-400">
-                <img :src="props.item.icon??''" :alt="props.item.icon??''" class="object-cover w-full h-full" />
+                <img :src="props.item.icon ?? ''" :alt="props.item.icon ?? ''" class="object-cover w-full h-full" />
             </div>
             <!-- price tag-->
             <div
@@ -30,9 +30,12 @@ const props = defineProps<{
             <p class="text-gray-500 text-sm mb-6">{{ props.item.description }}</p>
 
             <div class="flex items-center justify-between">
-                <span v-if="props.addToCart" class="text-sm font-medium text-gray-400">Add to order</span>
+                <!-- add to cart button-->
+                <span v-if="props.addToCart" class="text-sm font-medium text-gray-400">
+                    {{ $t('food.addToCart') }}
+                </span>
                 <button v-if="props.addToCart" @click="props.addToCart(props.item)"
-                    class="bg-orange-500 hover:bg-orange-600 text-white w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90 shadow-lg shadow-orange-200">
+                    class="hover:cursor-pointer bg-orange-500 hover:bg-orange-600 text-white w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90 shadow-lg shadow-orange-200">
                     <span class="text-xl font-bold">+</span>
                 </button>
             </div>

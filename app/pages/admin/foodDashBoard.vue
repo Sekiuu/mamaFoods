@@ -89,7 +89,7 @@
 import FoodForm from '~/components/admin/FoodForm.vue'
 import FoodListTable from '~/components/admin/FoodListTable.vue'
 import FoodDelete from '~/components/admin/FoodDelete.vue'
-import PageHeader from "~/components/admin/PageHeader.vue";
+import PageHeader  from '~/components/admin/AdminHeader.vue'
 import { useSearch } from "~/composables/useSearch";
 
 interface Food {

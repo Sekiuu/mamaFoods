@@ -2,15 +2,23 @@
   <div class="rounded-3xl border border-gray-100 p-8 shadow-sm" :class="statusColor(order? order.status : OrderStatus.Pending)">
     <!-- Header and Order Summary -->
     <div class="mb-8 grid gap-6 lg:grid-cols-2">
-      <div>
-        <p class="text-sm text-gray-500">Order #{{ order.id }}</p>
-        <h2 class="text-3xl font-bold text-gray-900 mt-2">Order Summary</h2>
-        <p>Status: <OrderStatusTag :status="order.status" class="w-fit inline-block"/></p>
+      <div class="space-y-3">
+        <p class="text-sm text-gray-500">
+          {{ $t("orderCard.orderId") }} #{{ order.id }}
+        </p>
+        <h2 class="text-3xl font-bold text-gray-900 mt-2">
+          {{ $t("orderCard.orderSummary") }}
+        </h2>
+        <p>{{ $t("order.status.title") }}: <OrderStatusTag :status="order.status" class="w-fit inline-block"/></p>
       </div>
       <div class="space-y-3 text-right">
-        <p class="text-sm text-gray-500">Created</p>
+        <p class="text-sm text-gray-500">
+          {{ $t("orderCard.orderDate") }}
+        </p>
         <p class="text-lg font-semibold text-gray-900">{{ formattedDate }}</p>
-        <p class="text-sm text-gray-500">Phone</p>
+        <p class="text-sm text-gray-500">
+          {{ $t("customerInfo.phone") }}
+        </p>
         <p class="text-base text-gray-700">{{ order.customer_phone }}</p>
       </div>
     </div>
@@ -32,28 +40,36 @@
     <!-- Order Total and Address -->
     <div class="mt-6 border-t border-gray-200 pt-6">
       <div class="flex items-center justify-between">
-        <span class="text-lg font-semibold text-gray-900">Total</span>
+        <span class="text-lg font-semibold text-gray-900">
+          {{ $t("shop.cart.total") }}
+        </span>
         <span class="text-2xl font-bold text-orange-600">฿{{ order.total_price }}</span>
       </div>
-      <p class="text-sm text-gray-500 mt-1">Delivery address: {{ order.customer_address }}</p>
-      <p class="text-sm text-gray-500">Note: {{ order.customer_note || 'None' }}</p>
+      <p class="text-sm text-gray-500 mt-1">
+        {{ $t("customerInfo.address") }} : {{ order.customer_address }}</p>
+      <p class="text-sm text-gray-500">
+        {{ $t("customerInfo.note") }} : {{ order.customer_note || 'None' }}</p>
     </div>
     <!-- Payment QR Code -->
     <div v-if="order.status === OrderStatus.Pending" class="mt-8">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Payment QR Code</h3>
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">
+        {{ $t("payment.qrCode.title") }}
+      </h3>
       <div v-if="qrDataUrl" class="rounded-3xl bg-gray-50/25 p-6 text-center">
         <img :src="qrDataUrl" alt="PromptPay QR Code" class="mx-auto h-64 w-64" />
-        <p class="mt-4 text-sm text-gray-500">Scan this QR code with PromptPay to pay the order amount.</p>
+        <p class="mt-4 text-sm text-gray-500">
+          {{ $t("payment.qrCode.desc") }}
+        </p>
       </div>
       <div v-else class="rounded-3xl bg-gray-50 p-6 text-center text-gray-500">
-        Generating payment code...
+        {{ $t("payment.qrCode.loading") }}
       </div>
     </div>
     <!-- Cancel Order Button -->
     <div v-if="cancelable" class="mt-8">
       <button @click="onCancleOrder"
         class="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-2xl transition-colors">
-        Cancel Order
+        {{ $t("orderCard.cancelOrder") }}
       </button>
     </div>
 
@@ -66,6 +82,7 @@ import QRCode from 'qrcode'
 import type { Order, CartItem } from '~/types'
 import { OrderStatus } from '~/types/orders'
 import { useRouter } from 'vue-router'
+const { locales, locale: currentLocale, setLocale } = useI18n()
 const router = useRouter()
 
 
@@ -93,7 +110,7 @@ const statusColor = (status: string) => {
 const formattedDate = computed(() => {
   if (!props.order.create_at) return 'Unknown'
   const date = new Date(props.order.create_at)
-  return date.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
+  return date.toLocaleString(currentLocale.value, { dateStyle: 'medium', timeStyle: 'short'})
 })
 
 const cancelable = computed(() => {

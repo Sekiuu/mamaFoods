@@ -75,6 +75,6 @@
     </div>
 </template>
 <script setup lang="ts">
-import PageHeader  from '~/components/admin/PageHeader.vue'
+import PageHeader  from '~/components/admin/AdminHeader.vue'
 import DashboardCard from '~/components/admin/DashboardCard.vue'
 </script>

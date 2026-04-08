@@ -1,0 +1,35 @@
+{
+    "welcome": {
+        "title": "Welcome to",
+        "subtitle": "Your favorite place for delicious meals, prepared with love and delivered with speed.",
+        "features": {
+            "title": "Our Features",
+            "fresh": {
+                "title": "Fresh Ingredients",
+                "desc": "Sourced daily from local farmers to ensure the best quality."
+            },
+            "fast": {
+                "title": "Fast Delivery",
+                "desc": "Hot and fresh food delivered to your door in under 30 mins."
+            },
+            "easy": {
+                "title": "Easy Ordering",
+                "desc": "A seamless experience from browsing to checkout."
+            }
+        },
+        "cta": {
+            "title": "Ready to eat?",
+            "desc": "Order now and enjoy a delicious meal delivered to your doorstep!",
+            "button": "Order Now"
+        }
+    },
+    "shop": {
+        "title": "Our Menu",
+        "subtitle": "Select your favorite dishes and order now.",
+        "empty": "No items found."
+    },
+    "nav":{
+        "menu": "Menu",
+        "myOrders": "My Orders"
+    }
+}

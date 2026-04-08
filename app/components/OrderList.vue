@@ -1,7 +1,9 @@
 <template>
     <div>
         <div v-if="activeOrders.length === 0" class="rounded-3xl bg-white p-10 shadow-sm border border-gray-100 text-center">
-            <p class="text-gray-500">No orders yet.</p>
+            <p class="text-gray-500">
+                {{ $t('orderList.empty') }}
+            </p>
         </div>
 
         <div v-else class="space-y-4">
@@ -26,7 +28,7 @@
                     <p class="text-sm text-gray-500">Created: {{ formatDate(order.create_at) }}</p>
                     <NuxtLink :to="`/myOrders/${order.id}`"
                         class="inline-flex items-center rounded-2xl bg-orange-600 px-4 py-2 text-white hover:bg-orange-700 transition">
-                        View Details
+                        {{ $t('orderList.viewDetails') }}
                     </NuxtLink>
                 </div>
             </div>

@@ -5,16 +5,8 @@
             <!-- Header -->
             <div class="flex justify-between items-end mb-10">
                 <div>
-                    <h1 class="text-4xl font-extrabold text-gray-900">Our Menu</h1>
-                    <p class="text-gray-600 mt-2">Select your favorite dishes and order now.</p>
-                </div>
-
-                <div class="relative">
-                    <button
-                        @click="() => router.push('/myOrders')"
-                        class="bg-orange-100 p-3 rounded-2xl shadow-sm border border-gray-200 hover:bg-orange-200 transition-colors">
-                        <span class="text-2xl">my all orders</span>
-                    </button>
+                    <h1 class="text-4xl font-extrabold text-gray-900">{{ $t('shop.title') }}</h1>
+                    <p class="text-gray-600 mt-2">{{ $t('shop.subtitle') }}</p>
                 </div>
             </div>
 
@@ -32,7 +24,7 @@
                     </div>
                 <!-- in case of empty menu -->
                     <div v-else class="rounded-3xl bg-white p-10 shadow-sm border border-gray-100 text-center">
-                        <p class="text-gray-500">No items found.</p>
+                        <p class="text-gray-500">{{ $t('shop.empty') }}</p>
                     </div>
                 </div>
 
@@ -40,18 +32,21 @@
                 <div class="lg:col-span-1">
                     <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 sticky top-6">
                         <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                            Your Order
-                            <span class="ml-3 text-sm font-normal text-gray-400">({{ totalItems }} items)</span>
+                            {{ $t("shop.cart.title") }}
+                            <span class="ml-3 text-sm font-normal text-gray-400">
+                                ({{ totalItems }} {{ $t('shop.cart.items') }})</span>
                         </h2>
                         <!-- in case of empty cart -->
-                        <div v-if="cart.length === 0" class="py-12 text-center">
+                        <div v-if="cartItems.length === 0" class="py-12 text-center">
                             <div class="text-4xl mb-4 opacity-20">🍱</div>
-                            <p class="text-gray-400">Your cart is empty.<br>Start adding some food!</p>
+                            <p class="text-gray-400">
+                                {{ $t('shop.cart.empty') }}
+                            </p>
                         </div>
 
                         <!-- in case of non-empty cart -->
                         <div v-else class="space-y-4 mb-8">
-                            <div v-for="cartItem in cart" :key="cartItem.id"
+                            <div v-for="cartItem in cartItems" :key="cartItem.id"
                                 class="flex justify-between items-center bg-gray-50 p-3 rounded-2xl">
                                 <div class="flex items-center gap-3">
 
@@ -63,24 +58,32 @@
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <button @click="removeFromCart(cartItem.id)"
-                                        class="text-gray-400 hover:text-red-500 font-bold px-2">-</button>
-                                    <span class="font-mono text-sm">{{ cartItem.quantity }}</span>
+                                        class="hover:cursor-pointer text-gray-400 hover:text-red-500 font-bold px-2">
+                                        -
+                                    </button>
+
+                                    <span class="font-mono text-sm text-gray-600">{{ cartItem.quantity }}</span>
+
                                     <button @click="addToCart(cartItem)"
-                                        class="text-orange-500 font-bold px-2">+</button>
+                                        class="hover:cursor-pointer text-orange-500 font-bold px-2">
+                                        +
+                                    </button>
                                 </div>
                             </div>
                         </div>
                         <!-- horizontal line for seperate sections form check out button -->
-                        <hr v-if="cart.length > 0" class="border-gray-100 mb-6">
+                        <hr v-if="cartItems.length > 0" class="border-gray-100 mb-6">
                         <!-- checkout button-->
-                        <div v-if="cart.length > 0">
+                        <div v-if="cartItems.length > 0">
                             <div class="flex justify-between text-lg mb-6 font-bold">
-                                <span>Total</span>
+                                <span class="text-gray-600">
+                                    {{ $t('shop.cart.total') }}
+                                </span>
                                 <span class="text-orange-600 font-mono text-xl">฿{{ totalPrice }}</span>
                             </div>
                             <button @click="checkout"
-                                class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-2xl transition-all shadow-lg">
-                                Checkout Now
+                                class="hover:cursor-pointer w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-2xl transition-all shadow-lg">
+                                {{ $t('shop.cart.checkout') }}
                             </button>
                         </div>
                     </div>
@@ -95,6 +98,7 @@
 
 const CART_KEY = process.env.CART_KEY || 'mamaFoodCart'
 const router = useRouter()
+const cartCookie = useCookie<CartItem[] | null>(CART_KEY)
 const loading = ref(false)
 interface MenuItem {
     id: number
@@ -131,42 +135,42 @@ onMounted(async () => {
     }
 })
 
-const cart = ref<CartItem[]>([])
+const cartItems = ref<CartItem[]>([])
 
 // Logic
 const addToCart = (item: MenuItem) => {
-    const existing = cart.value.find((c): c is CartItem => c.id === item.id)
+    const existing = cartItems.value.find((c): c is CartItem => c.id === item.id)
     if (existing) {
         existing.quantity++
     } else {
-        cart.value.push({ ...item, quantity: 1 })
+        cartItems.value.push({ ...item, quantity: 1 })
     }
 }
 
 const removeFromCart = (id: number) => {
-    const index = cart.value.findIndex(c => c.id === id)
+    const index = cartItems.value.findIndex(c => c.id === id)
     if (index !== -1) {
-        const cartItem = cart.value[index]
+        const cartItem = cartItems.value[index]
         if (cartItem == undefined || cartItem == null) return;
 
         if (cartItem.quantity > 1) {
             cartItem.quantity--
         } else {
-            cart.value.splice(index, 1)
+            cartItems.value.splice(index, 1)
         }
     }
 }
 
 const totalItems = computed(() => {
-    return cart.value.reduce((sum, item) => sum + item.quantity, 0)
+    return cartItems.value.reduce((sum, item) => sum + item.quantity, 0)
 })
 
 const totalPrice = computed(() => {
-    return cart.value.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+    return cartItems.value.reduce((sum, item) => sum + (item.price * item.quantity), 0)
 })
 const checkout = () => {
-    // Save cart to localStorage (you might want to use a proper state management solution)
-    localStorage.setItem(CART_KEY, JSON.stringify(cart.value))
+    // บันทึกตะกร้าลงใน Cookie (cartItems คือข้อมูลปัจจุบันในหน้า shop)
+    cartCookie.value = cartItems.value
     // Redirect to checkout page
     router.push('/checkout')
 }

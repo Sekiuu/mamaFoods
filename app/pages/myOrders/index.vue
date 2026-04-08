@@ -2,8 +2,12 @@
     <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-5xl mx-auto">
             <div class="mb-10 text-center">
-                <h1 class="text-4xl font-extrabold text-gray-900">My Orders</h1>
-                <p class="text-gray-600 mt-2">Review your recent purchases and open any order for payment details.</p>
+                <h1 class="text-4xl font-extrabold text-gray-900">
+                    {{ $t('myOrders.title') }}
+                </h1>
+                <p class="text-gray-600 mt-2">
+                    {{ $t('myOrders.subtitle') }}
+                </p>
             </div>
 
             <div v-if="loading" class="flex justify-center py-20">
@@ -11,16 +15,18 @@
             </div>
             <div v-else>
                 <div class="mb-2">
-                    <span class="filter-btn hover:bg-gray-500 bg-gray-100 text-gray-600" @click="showOpenOrders()"> open
-                        orders</span>
-                    <span class="filter-btn hover:bg-green-500 bg-green-100 text-green-600"
-                        @click="showCompletedOrders()"> completed orders</span>
-                    <span class="filter-btn hover:bg-rose-500 bg-rose-100 text-rose-600" @click="showCancelledOrders()">
-                        cancelled orders</span>
-                    <span class="float-right filter-btn hover:bg-rose-500 bg-rose-100 text-rose-600"
-                        @click="()=> router.push('/shop')">
-                        order your food again
-                    </span>
+                    <UButton class="mr-2 bg-yellow-500 hover:bg-yellow-600 text-white" @click="() => setFilterStatus([])">
+                        {{ $t('myOrders.tabs.all') }}
+                    </UButton>
+                    <UButton class="mr-2 bg-blue-500 hover:bg-blue-600 text-white" @click="showOpenOrders">
+                        {{ $t('myOrders.tabs.pending') }}
+                    </UButton>
+                    <UButton class="mr-2 bg-red-500 hover:bg-red-600 text-white" @click="showCancelledOrders">
+                        {{ $t('myOrders.tabs.cancelled') }}
+                    </UButton>
+                    <UButton class="mr-2 bg-green-500 hover:bg-green-600 text-white" @click="showCompletedOrders">
+                        {{ $t('myOrders.tabs.completed') }}
+                    </UButton>
                 </div>
                 <OrderList :orders="orders" :formatDate="formatDate" :filterStatus="filterStatus" />
             </div>
@@ -29,12 +35,12 @@
 </template>
 
 <script setup lang="ts">
-import { useCookie } from '#imports'
 import type { Order } from '~/types'
 import { OrderStatus } from '~/types/orders'
-const router = useRouter()
 
-const orderIdsCookie = useCookie<number[]>('mamaFoodOrderIds', {
+const ORDER_IDS_COOKIE = process.env.ORDER_IDS_COOKIE || 'mamaFoodOrderIds'
+
+const orderIdsCookie = useCookie<number[]>(ORDER_IDS_COOKIE, {
     default: () => [],
 })
 const orders = ref<Order[]>([])
@@ -98,7 +104,7 @@ const showCompletedOrders = () => setFilterStatus([
 ])
 const showOpenOrders = () => setFilterStatus([
     OrderStatus.Cancelled,
-    OrderStatus.Confirmed,
+    OrderStatus.Completed,
 ])
 
 
@@ -107,9 +113,3 @@ onMounted(() => {
     showOpenOrders()
 })
 </script>
-
-<style scoped>
-.filter-btn {
-    @apply px-4 py-2 rounded-md cursor-pointer text-sm font-medium text-gray-600 transition-colors;
-}
-</style>

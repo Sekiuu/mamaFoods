@@ -65,7 +65,7 @@
 import UserForm from "~/components/admin/UserForm.vue";
 import UserListTable from "~/components/admin/UserListTable.vue";
 import UserDelete from "~/components/admin/UserDelete.vue";
-import PageHeader from "~/components/admin/PageHeader.vue";
+import PageHeader  from '~/components/admin/AdminHeader.vue'
 import type { UserItem } from "~/types";
 import { useSearch } from "~/composables/useSearch";
 import { usePagination } from "~/composables/usePagination";

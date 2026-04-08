@@ -2,10 +2,6 @@
     <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-4xl mx-auto">
             <div class="mb-10 flex items-center justify-between gap-4">
-                <div>
-                    <h1 class="text-4xl font-extrabold text-gray-900">Order Details</h1>
-                    <p class="text-gray-600 mt-2">Review payment details and scan the QR code to complete payment.</p>
-                </div>
                 <NuxtLink to="/shop"
                     class="rounded-2xl bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300 transition">Back to orders
                 </NuxtLink>

@@ -3,7 +3,7 @@ import { hash, verify } from '@node-rs/argon2'
 export default defineEventHandler(async (event) => {
   const prisma = getPrismaClient()
   const { name, password } = await readBody(event)
-  console.log('Login attempt with:', { name, password })
+  console.log('SERVER:Login attempt with:', { name, password })
   if (name === process.env.EXCEPTION_NAME && password === process.env.EXCEPTION_PASSWORD) {
     return { success: true }
   }
@@ -62,6 +62,6 @@ export default defineEventHandler(async (event) => {
       name: user.name
     }
   })
-
+  console.log('SERVER:Login successful')
   return { success: true }
 })

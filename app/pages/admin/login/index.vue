@@ -62,7 +62,7 @@ const error = ref('')
 const login = async () => {
   loading.value = true
   error.value = ''
-  console.log('Attempting login with', form.value)
+  // console.log('Attempting login with', form.value)
   try {
     const response = await $fetch('/api/auth/login', {
       method: 'POST',
