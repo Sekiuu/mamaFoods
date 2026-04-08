@@ -17,5 +17,10 @@ export default defineNuxtConfig({
     auth: {
       secret: process.env.NUXT_AUTH_SECRET || 'your-secret-key-change-this-in-production'
     }
+  },
+  nitro: {
+    externals: {
+      external: ['@prisma/client']
+    }
   }
 })
