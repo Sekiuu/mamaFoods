@@ -16,10 +16,10 @@
 }
 
 div{
-    @apply text-gray-800
+    @apply text-gray-800;
 }
 input,select{
-    @apply bg-white
+    @apply bg-white;
 }
 input::placeholder, textarea::placeholder{ 
     @apply text-gray-400;
