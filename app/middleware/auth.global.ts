@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware((to) => {
-    const { loggedIn } = useUserSession()
+    const { user: loggedIn } = useUserSession()
     
     // Handle Admin Protection
     if (to.path.startsWith('/admin') && to.path !== '/admin/login' && !loggedIn.value) {

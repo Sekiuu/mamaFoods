@@ -5,13 +5,13 @@ export default defineEventHandler(async (event) => {
   const { name, password } = await readBody(event)
   console.log('SERVER:Login attempt with:', { name, password })
   if (name === process.env.EXCEPTION_NAME && password === process.env.EXCEPTION_PASSWORD) {
-    console.log('SERVER:Login exception successful')
-    await setUserSession(event, {
+    const session = await setUserSession(event, {
       user: {
         id: -1,
-        name: 'exception'
+        name: 'mama'
       }
     })
+    console.log('SERVER:Login exception successful')
     return { success: true }
   }
 
