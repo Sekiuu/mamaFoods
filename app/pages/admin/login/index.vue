@@ -1,3 +1,34 @@
+<script setup>
+const form = ref({
+  name: '',
+  password: ''
+})
+
+const loading = ref(false)
+const error = ref('')
+
+// Import useAuth from nuxt-auth-utils to use its signIn function
+const { signin: signIn } = useAdminAuth()
+
+const login = async () => {
+  loading.value = true
+  error.value = ''
+  // console.log('Attempting login with', form.value)
+  try {
+    // Use the signIn function provided by nuxt-auth-utils.
+    // It handles the API call to /api/auth/login and automatically updates the client-side session.
+    // We set `redirect: false` because we want to handle the navigation manually after the session is updated.
+    await signIn(form.value.name, form.value.password)
+    console.log('Client : Login successful. redirecting... to admin.')
+    navigateTo('/admin')
+  } catch (err) { // Type err as any to handle potential different error structures from signIn
+    error.value = err.data?.statusMessage || err.message || 'Login failed' // Extract error message
+  } finally {
+    loading.value = false
+  }
+}
+</script>
+
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gray-50">
     <div class="max-w-md w-full space-y-8">
@@ -10,35 +41,21 @@
         <div class="rounded-md shadow-sm -space-y-px">
           <div>
             <label for="name" class="sr-only">Username</label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              required
+            <input id="name" name="name" type="text" required
               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Username"
-              v-model="form.name"
-            />
+              placeholder="Username" v-model="form.name" />
           </div>
           <div>
             <label for="password" class="sr-only">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
+            <input id="password" name="password" type="password" required
               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Password"
-              v-model="form.password"
-            />
+              placeholder="Password" v-model="form.password" />
           </div>
         </div>
         <div>
-          <button
-            type="submit"
+          <button type="submit"
             class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            :disabled="loading"
-          >
+            :disabled="loading">
             {{ loading ? 'Signing in...' : 'Sign in' }}
           </button>
         </div>
@@ -49,34 +66,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-const form = ref({
-  name: '',
-  password: ''
-})
-
-const loading = ref(false)
-const error = ref('')
-
- // Import useAuth from nuxt-auth-utils to use its signIn function
-const { signIn } = useAuth()
-
-const login = async () => {
-  loading.value = true
-  error.value = ''
-  // console.log('Attempting login with', form.value)
-  try {
-    // Use the signIn function provided by nuxt-auth-utils.
-    // It handles the API call to /api/auth/login and automatically updates the client-side session.
-    // We set `redirect: false` because we want to handle the navigation manually after the session is updated.
-    await signIn(form.value, { redirect: false })
-    console.log('Client : Login successful. redirecting... to admin.')
-    navigateTo('/admin')
-  } catch (err) { // Type err as any to handle potential different error structures from signIn
-    error.value = err.data?.statusMessage || err.message || 'Login failed' // Extract error message
-  } finally {
-    loading.value = false
-  }
-}
-</script>

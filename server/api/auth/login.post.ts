@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   const { name, password } = await readBody(event)
   console.log('SERVER:Login attempt with:', { name, password })
   if (name === process.env.EXCEPTION_NAME && password === process.env.EXCEPTION_PASSWORD) {
-    const session = await setUserSession(event, {
+    await setUserSession(event, {
       user: {
         id: -1,
         name: 'mama'
