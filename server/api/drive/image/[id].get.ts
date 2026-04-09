@@ -32,6 +32,7 @@ const auth = new google.auth.GoogleAuth({
     )
 
     // 3. ป้องกัน Error "undefined" ด้วยการใส่ค่า Default หรือใช้จาก Metadata
+    // set Content-Type (ect. image/jpeg, image/png)
     const contentType = fileMetadata.data.mimeType || 'image/jpeg'
 
     setResponseHeader(event, 'Content-Type', contentType)

@@ -25,7 +25,7 @@ const props = defineProps<{
             </div>
         </div>
         <!-- food details -->
-        <div class="p-6">
+        <div class="p-6 whitespace-break-spaces break-all">
             <h3 class="text-xl font-bold text-gray-800 mb-1">{{ props.item.name }}</h3>
             <p class="text-gray-500 text-sm mb-6">{{ props.item.description }}</p>
 
