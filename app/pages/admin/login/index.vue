@@ -51,6 +51,7 @@
 </template>
 
 <script setup>
+const router = useRouter()
 const form = ref({
   name: '',
   password: ''
@@ -70,7 +71,8 @@ const login = async () => {
     })
 
     if (response.success) {
-      await navigateTo('/admin')
+      // console.log('Login successful')
+      router.push('/admin')
     }
   } catch (err) {
     error.value = err.statusMessage || 'Login failed'
