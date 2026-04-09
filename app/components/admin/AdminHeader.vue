@@ -9,9 +9,10 @@
           <button
             v-if="enableLogout"
             @click="handleLogout"
+            :disabled="processing"
             class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md"
           >
-            Logout
+            {{processing ? 'Logging out...' : "Logout" }}
           </button>
         </div>
       </div>
@@ -28,8 +29,16 @@ interface Props {
 defineProps<Props>()
 
 const { logout } = useAdminAuth()
-
-const handleLogout = () => {
-  logout()
+const processing = ref(false)
+const handleLogout = async () => {
+  processing.value = true
+  try{
+    await logout()
+    navigateTo('/admin/login')
+  }catch(err){
+    console.log(err)
+  } finally {
+    processing.value = false
+  }
 }
 </script>
