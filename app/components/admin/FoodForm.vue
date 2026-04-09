@@ -85,7 +85,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import type { FoodItem } from '../../types'
-
+import { useDriveImage } from "~/composables/useDriveImage";
 interface FormData {
   name: string;
   price: string;
@@ -101,6 +101,7 @@ const emit = defineEmits<{
   "food-created": [];
   "food-updated": [];
 }>();
+
 
 const isLoading = ref(false);
 const errorMessage = ref("");
@@ -138,12 +139,18 @@ const loadEditingFood = () => {
   }
 };
 
+const { getImageURL } = useDriveImage();
 const submitForm = async () => {
   isLoading.value = true;
   errorMessage.value = "";
   successMessage.value = "";
-
+  
+  
   try {
+    // Validate form data
+    const iconUrl = await getImageURL(formData.value.icon.trim());
+    formData.value.icon = iconUrl;
+    
     if (isEditing.value && props.editingFood?.id) {
       // Update existing food
       await $fetch(`/api/foods/${props.editingFood.id}`, {

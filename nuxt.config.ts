@@ -16,6 +16,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     auth: {
       secret: process.env.NUXT_AUTH_SECRET || 'your-secret-key-change-this-in-production'
-    }
+    },
+    googleServiceAccountJson: process.env.GOOGLE_SERVICE_ACCOUNT_JSON
   },
 })

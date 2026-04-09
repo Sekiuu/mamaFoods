@@ -20,7 +20,7 @@ const login = async () => {
     // We set `redirect: false` because we want to handle the navigation manually after the session is updated.
     await signIn(form.value.name, form.value.password)
     console.log('Client : Login successful. redirecting... to admin.')
-    navigateTo('/admin')
+    await navigateTo('/admin')
   } catch (err) { // Type err as any to handle potential different error structures from signIn
     error.value = err.data?.statusMessage || err.message || 'Login failed' // Extract error message
   } finally {
