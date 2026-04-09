@@ -59,22 +59,22 @@ const form = ref({
 const loading = ref(false)
 const error = ref('')
 
+ // Import useAuth from nuxt-auth-utils to use its signIn function
+const { signIn } = useAuth()
+
 const login = async () => {
   loading.value = true
   error.value = ''
   // console.log('Attempting login with', form.value)
   try {
-    const response = await $fetch('/api/auth/login', {
-      method: 'POST',
-      body: form.value
-    })
-
-    if (response.success) {
-      console.log('Client : Login successful. redirecting... to admin.')
-      navigateTo('/admin')
-    }
-  } catch (err) {
-    error.value = err.statusMessage || 'Login failed'
+    // Use the signIn function provided by nuxt-auth-utils.
+    // It handles the API call to /api/auth/login and automatically updates the client-side session.
+    // We set `redirect: false` because we want to handle the navigation manually after the session is updated.
+    await signIn(form.value, { redirect: false })
+    console.log('Client : Login successful. redirecting... to admin.')
+    navigateTo('/admin')
+  } catch (err) { // Type err as any to handle potential different error structures from signIn
+    error.value = err.data?.statusMessage || err.message || 'Login failed' // Extract error message
   } finally {
     loading.value = false
   }
