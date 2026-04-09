@@ -71,7 +71,7 @@ const login = async () => {
     })
 
     if (response.success) {
-      // console.log('Login successful')
+      console.log('Client : Login successful. redirecting... to admin.')
       router.push('/admin')
     }
   } catch (err) {
