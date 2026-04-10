@@ -9,12 +9,13 @@ export default defineEventHandler(async (event) => {
   // ดึง JSON String จาก Env และแปลงกลับเป็น Object
   const googleServiceAccountJson = config.googleServiceAccountJson.trim()
   if (!googleServiceAccountJson || googleServiceAccountJson.length === 0) {
-    createError({
+    throw createError({
       statusCode: 400,
       statusMessage: 'Missing googleServiceAccountJson in .env file'
     })
   }
   const serviceAccount = JSON.parse(googleServiceAccountJson)
+
   const auth = new google.auth.GoogleAuth({
     // เปลี่ยนจาก keyFile เป็น credentials
     credentials: {
