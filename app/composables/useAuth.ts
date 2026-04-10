@@ -1,7 +1,7 @@
-import type { UserItem } from "~/types"
+// import type { UserItem } from "~/types"
 
-export const useAdminAuth = () => {
-    const { fetch: refreshSession } = useUserSession()
+export const useAuth = () => {
+    const { fetch: refreshSession, session } = useUserSession()
     const logout = async () => {
         await $fetch('/api/auth/logout', {
             method: 'POST'
@@ -15,8 +15,12 @@ export const useAdminAuth = () => {
         })
         await refreshSession()
     }
+    const isAdmin = computed(() => session.value?.user?.role === 'admin')
+    const isOperator = computed(() => session.value?.user?.role === 'operator')
 
     return {
+        isAdmin,
+        isOperator,
         logout,
         signin
     }

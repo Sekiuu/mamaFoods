@@ -1,196 +1,159 @@
 <template>
-  <div class="food-form-container">
-    <h2 class="text-2xl font-bold mb-4">
-      {{ isEditing ? "Edit Food Item" : "Add New Food Item" }}
-    </h2>
-    
-    <form @submit.prevent="submitForm" class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Food Name<span class="text-red-500">*</span>
-        </label>
-        <input
-          v-model="formData.name"
-          type="text"
-          placeholder="Enter food name"
-          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-      </div>
+  <UCard>
+    <template #header>
+      <h2 class="text-2xl font-bold">
+        {{ isEditing ? 'Edit Food Item' : 'Add New Food Item' }}
+      </h2>
+    </template>
 
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Price<span class="text-red-500">*</span>
-        </label>
-        <input
-          v-model="formData.price"
-          type="text"
-          placeholder="Enter price"
-          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-      </div>
+    <UForm :schema="schema" :state="formData" class="space-y-4" @submit="submitForm">
+      <UFormField label="Food Name" name="name" required>
+        <UInput v-model="formData.name" placeholder="Enter food name" class="w-full" />
+      </UFormField>
 
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Description
-        </label>
-        <textarea
-          v-model="formData.description"
-          placeholder="Enter food description"
-          rows="4"
-          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        ></textarea>
-      </div>
+      <UFormField label="Price" name="price" required>
+        <UInput v-model="formData.price" placeholder="Enter price" class="w-full" />
+      </UFormField>
 
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Icon URL
-        </label>
-        <input
-          v-model="formData.icon"
-          type="text"
-          placeholder="Enter icon URL"
-          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
+      <UFormField label="Description" name="description">
+        <UTextarea v-model="formData.description" placeholder="Enter food description" :rows="4" class="w-full" />
+      </UFormField>
+
+      <UFormField label="Icon URL" name="icon">
+        <UInput v-model="formData.icon" placeholder="Enter icon URL" class="w-full" />
+      </UFormField>
 
       <div class="flex gap-4 pt-4">
-        <button
-          type="submit"
-          :disabled="isLoading"
-          class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:bg-gray-400"
-        >
-          {{ isLoading ? "Loading..." : isEditing ? "Update" : "Create" }}
-        </button>
-        <button
-          type="button"
-          @click="resetForm"
-          class="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
-        >
+        <UButton type="submit" color="success" :loading="isLoading">
+          {{ isEditing ? 'Update' : 'Create' }}
+        </UButton>
+        <UButton type="button" color="neutral" variant="soft" @click="resetForm">
           Clear
-        </button>
+        </UButton>
       </div>
-    </form>
+    </UForm>
 
-    <div v-if="errorMessage" class="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-      {{ errorMessage }}
-    </div>
-    <div v-if="successMessage" class="mt-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-      {{ successMessage }}
-    </div>
-  </div>
+    <UAlert
+      v-if="errorMessage"
+      color="error"
+      variant="soft"
+      icon="i-lucide-circle-x"
+      :description="errorMessage"
+      class="mt-4"
+      close
+      @update:open="errorMessage = ''"
+    />
+    <UAlert
+      v-if="successMessage"
+      color="success"
+      variant="soft"
+      icon="i-lucide-circle-check"
+      :description="successMessage"
+      class="mt-4"
+      close
+      @update:open="successMessage = ''"
+    />
+  </UCard>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import * as v from 'valibot'
 import type { FoodItem } from '../../types'
-import { useDriveImage } from "~/composables/useDriveImage";
+import { useDriveImage } from '~/composables/useDriveImage'
+
+const schema = v.object({
+  name: v.pipe(v.string(), v.minLength(1, 'Food name is required.')),
+  price: v.pipe(v.string(), v.minLength(1, 'Price is required.')),
+  description: v.optional(v.string()),
+  icon: v.optional(v.string()),
+})
+
 interface FormData {
-  name: string;
-  price: string;
-  description: string;
-  icon: string;
+  name: string
+  price: string
+  description: string
+  icon: string
 }
 
 const props = defineProps<{
-  editingFood?: FoodItem | null;
-}>();
+  editingFood?: FoodItem | null
+}>()
 
 const emit = defineEmits<{
-  "food-created": [];
-  "food-updated": [];
-}>();
+  'food-created': []
+  'food-updated': []
+}>()
 
-
-const isLoading = ref(false);
-const errorMessage = ref("");
-const successMessage = ref("");
-const isEditing = ref(false);
+const isLoading = ref(false)
+const errorMessage = ref('')
+const successMessage = ref('')
+const isEditing = ref(false)
 
 const formData = ref<FormData>({
-  name: "",
-  price: "",
-  description: "",
-  icon: "",
-});
+  name: '',
+  price: '',
+  description: '',
+  icon: '',
+})
 
 const resetForm = () => {
-  formData.value = {
-    name: "",
-    price: "",
-    description: "",
-    icon: "",
-  };
-  isEditing.value = false;
-  errorMessage.value = "";
-  successMessage.value = "";
-};
+  formData.value = { name: '', price: '', description: '', icon: '' }
+  isEditing.value = false
+  errorMessage.value = ''
+  successMessage.value = ''
+}
 
 const loadEditingFood = () => {
   if (props.editingFood) {
     formData.value = {
-      name: props.editingFood.name || "",
-      price: props.editingFood.price || "",
-      description: props.editingFood.description || "",
-      icon: props.editingFood.icon || "",
-    };
-    isEditing.value = true;
-  }
-};
-
-const { getImageURL } = useDriveImage();
-const submitForm = async () => {
-  isLoading.value = true;
-  errorMessage.value = "";
-  successMessage.value = "";
-  
-  
-  try {
-    // Validate form data
-    const iconUrl = await getImageURL(formData.value.icon.trim());
-    formData.value.icon = iconUrl;
-    
-    if (isEditing.value && props.editingFood?.id) {
-      // Update existing food
-      await $fetch(`/api/foods/${props.editingFood.id}`, {
-        method: "PUT",
-        body: formData.value,
-      });
-      successMessage.value = "Food item updated successfully!";
-      emit("food-updated");
-    } else {
-      // Create new food
-      await $fetch("/api/foods", {
-        method: "POST",
-        body: formData.value,
-      });
-      successMessage.value = "Food item created successfully!";
-      emit("food-created");
+      name: props.editingFood.name || '',
+      price: props.editingFood.price || '',
+      description: props.editingFood.description || '',
+      icon: props.editingFood.icon || '',
     }
-    resetForm();
-  } catch (error: any) {
-    errorMessage.value = error?.data?.statusMessage || "An error occurred";
-  } finally {
-    isLoading.value = false;
+    isEditing.value = true
   }
-};
+}
+
+const { getImageURL } = useDriveImage()
+
+const submitForm = async () => {
+  isLoading.value = true
+  errorMessage.value = ''
+  successMessage.value = ''
+
+  try {
+    const iconUrl = await getImageURL(formData.value.icon.trim())
+    formData.value.icon = iconUrl
+
+    if (isEditing.value && props.editingFood?.id) {
+      await $fetch(`/api/foods/${props.editingFood.id}`, {
+        method: 'PUT',
+        body: formData.value,
+      })
+      successMessage.value = 'Food item updated successfully!'
+      emit('food-updated')
+    } else {
+      await $fetch('/api/foods', {
+        method: 'POST',
+        body: formData.value,
+      })
+      successMessage.value = 'Food item created successfully!'
+      emit('food-created')
+    }
+
+    resetForm()
+  } catch (error: any) {
+    errorMessage.value = error?.data?.statusMessage || 'An error occurred'
+  } finally {
+    isLoading.value = false
+  }
+}
 
 watch(
   () => props.editingFood,
   () => {
-    if (props.editingFood) {
-      loadEditingFood();
-    }
+    if (props.editingFood) loadEditingFood()
   }
-);
+)
 </script>
-
-<style scoped>
-.food-form-container {
-  padding: 20px;
-  background-color: #f9fafb;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-}
-</style>

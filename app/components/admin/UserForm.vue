@@ -1,73 +1,64 @@
 <template>
-  <div class="user-form-container">
-    <h2 class="text-2xl font-bold mb-4">
-      {{ isEditing ? "Edit User" : "Add New User" }}
-    </h2>
+  <UCard>
+    <template #header>
+      <h1 class="text-3xl">{{ isEditing ? 'Edit User' : 'Create User' }}</h1>
+    </template>
 
-    <form @submit.prevent="submitForm" class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Name<span class="text-red-500">*</span>
-        </label>
-        <input
-          v-model="formData.name"
-          type="text"
-          placeholder="Enter user name"
-          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-      </div>
+    <UForm :schema="schema" :state="formData" class="space-y-4" @submit="submitForm">
+      <UFormField label="Name" name="name" required>
+        <UInput v-model="formData.name" type="text" placeholder="Enter user name" class="w-full" />
+      </UFormField>
 
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Password
-          <span v-if="!isEditing" class="text-red-500">*</span>
-          <span v-else class="text-gray-500 text-xs">(leave blank to keep)</span>
-        </label>
-        <input
-          v-model="formData.password"
-          type="password"
-          placeholder="Enter password"
-          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          :required="!isEditing"
-          autocomplete="new-password"
-        />
-      </div>
+      <UFormField label="Password" name="password" :hint="isEditing ? '(leave blank to keep)' : undefined"
+        :required="!isEditing">
+        <UInput v-model="formData.password" type="password" placeholder="Enter password" autocomplete="new-password"
+          class="w-full" />
+      </UFormField>
+
+      <UFormField label="Role" name="role" :required="!isEditing">
+        <USelect v-model="formData.role" :items="roles" placeholder="Select role" class="w-full" />
+      </UFormField>
 
       <div class="flex gap-4 pt-4">
-        <button
-          type="submit"
-          :disabled="isLoading"
-          class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:bg-gray-400"
-        >
-          {{ isLoading ? "Loading..." : isEditing ? "Update" : "Create" }}
-        </button>
-        <button
-          type="button"
-          @click="resetForm"
-          class="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
-        >
+        <UButton type="submit" color="success" :loading="isLoading">
+          {{ isEditing ? 'Update' : 'Create' }}
+        </UButton>
+        <UButton type="button" color="neutral" variant="soft" @click="resetForm">
           Clear
-        </button>
+        </UButton>
       </div>
-    </form>
+    </UForm>
 
-    <div v-if="errorMessage" class="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-      {{ errorMessage }}
-    </div>
-    <div v-if="successMessage" class="mt-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-      {{ successMessage }}
-    </div>
-  </div>
+    <UAlert v-if="errorMessage" color="error" variant="soft" icon="i-lucide-circle-x" :description="errorMessage"
+      class="mt-4" close @update:open="errorMessage = ''" />
+    <UAlert v-if="successMessage" color="success" variant="soft" icon="i-lucide-circle-check"
+      :description="successMessage" class="mt-4" close @update:open="successMessage = ''" />
+  </UCard>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
 import type { UserItem } from '../../types'
+import { roles, Role } from '~/types/users'
+import * as v from 'valibot'
+
+const schema = computed(() =>
+  v.object({
+    name: v.pipe(v.string(), v.minLength(3, 'Name must be at least 3 characters long.')),
+    password: isEditing.value
+      ? v.union([
+          v.literal(''),
+          v.pipe(v.string(), v.minLength(8, 'Password must be at least 8 characters long.')),
+        ])
+      : v.pipe(v.string(), v.minLength(8, 'Password must be at least 8 characters long.')),
+    role: v.optional(v.string()),
+  })
+)
+
 
 interface FormData {
   name: string
   password: string
+  role: Role.ADMIN | Role.OPERATOR | Role.CUSTOMER
 }
 
 const props = defineProps<{
@@ -88,10 +79,11 @@ const isEditing = ref(false)
 const formData = ref<FormData>({
   name: '',
   password: '',
+  role: Role.OPERATOR,
 })
 
 const resetForm = () => {
-  formData.value = { name: '', password: '' }
+  formData.value = { name: '', password: '', role: Role.OPERATOR }
   isEditing.value = false
   errorMessage.value = ''
   successMessage.value = ''
@@ -103,7 +95,9 @@ const loadEditingUser = () => {
     formData.value = {
       name: props.editingUser.name || '',
       password: '',
+      role: props.editingUser.role || Role.CUSTOMER,
     }
+    console.log(props.editingUser)
     isEditing.value = true
   }
 }
@@ -120,6 +114,7 @@ const submitForm = async () => {
         body: {
           name: formData.value.name,
           password: formData.value.password || undefined,
+          role: formData.value.role || '',
         },
       })
       successMessage.value = 'User updated successfully!'
@@ -130,6 +125,7 @@ const submitForm = async () => {
         body: {
           name: formData.value.name,
           password: formData.value.password,
+          role: formData.value.role || '',
         },
       })
       successMessage.value = 'User created successfully!'
@@ -151,13 +147,3 @@ watch(
   }
 )
 </script>
-
-<style scoped>
-.user-form-container {
-  padding: 20px;
-  background-color: #f9fafb;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-}
-</style>
-

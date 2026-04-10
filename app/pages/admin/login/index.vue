@@ -8,7 +8,7 @@ const loading = ref(false)
 const error = ref('')
 
 // Import useAuth from nuxt-auth-utils to use its signIn function
-const { signin: signIn } = useAdminAuth()
+const { signin: signIn } = useAuth()
 
 const login = async () => {
   loading.value = true

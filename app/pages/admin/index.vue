@@ -37,20 +37,18 @@
                             </NuxtLink>
                         </template>
                     </DashboardCard>
-                    
+
                     <!-- User Management -->
                     <DashboardCard title="User Management" description="Manage users">
                         <template #icon>
-                            <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 20h5v-2a4 4 0 00-4-4h-1m-4 6H3v-2a4 4 0 014-4h6a4 4 0 014 4v2zM9 10a4 4 0 100-8 4 4 0 000 8zm8-1a3 3 0 10-6 0 3 3 0 006 0z" />
-                            </svg>
+                            <UIcon name="heroicons:users" class="h-8 w-8 text-gray-400" />
                         </template>
                         <template #actions>
-                            <NuxtLink to="/admin/userDashBoard"
+                            <NuxtLink v-if="isAdmin" to="/admin/userDashBoard"
                                 class="ml-2 mt-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-md text-sm font-medium">
                                 View Users
                             </NuxtLink>
+                            <UAlert v-else :title="$t('alert.permission-denied')" color="neutral" variant="subtle" />
                         </template>
                     </DashboardCard>
 
@@ -75,6 +73,8 @@
     </div>
 </template>
 <script setup lang="ts">
-import PageHeader  from '~/components/admin/AdminHeader.vue'
+import PageHeader from '~/components/admin/AdminHeader.vue'
 import DashboardCard from '~/components/admin/DashboardCard.vue'
+import { useAuth } from '~/composables/useAuth';
+const { isAdmin, isOperator } = useAuth();
 </script>

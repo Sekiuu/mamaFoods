@@ -12,7 +12,7 @@
             </div>
 
             <div v-else-if="order">
-                <OrderCard :cancelable="true" :order="order" />
+                <OrderCard :cancelable="true" :order="ref(order)" />
             </div>
 
             <div v-else class="rounded-3xl bg-white p-10 shadow-sm border border-gray-100 text-center">

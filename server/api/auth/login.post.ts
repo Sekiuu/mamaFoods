@@ -8,7 +8,8 @@ export default defineEventHandler(async (event) => {
     await setUserSession(event, {
       user: {
         id: -1,
-        name: 'mama'
+        name: 'mama',
+        role: 'admin'
       }
     })
     console.log('SERVER:Login exception successful')
@@ -67,7 +68,8 @@ export default defineEventHandler(async (event) => {
   await setUserSession(event, {
     user: {
       id: user.id,
-      name: user.name
+      name: user.name,
+      role: user.role
     }
   })
   console.log('SERVER:Login successful')

@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
         select: {
           id: true,
           name: true,
+          role: true,
           create_at: true,
         },
         orderBy: { id: 'desc' },
@@ -26,6 +27,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const name = typeof body?.name === 'string' ? body.name.trim() : ''
     const password = typeof body?.password === 'string' ? body.password : ''
+    const role = typeof body?.role === 'string' ? body.role : ''
 
     if (!name || !password) {
       throw createError({
@@ -48,6 +50,7 @@ export default defineEventHandler(async (event) => {
         data: {
           name,
           password: passwordHash,
+          role : role,
           create_at: new Date(),
         },
         select: {

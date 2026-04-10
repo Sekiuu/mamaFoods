@@ -27,8 +27,9 @@ export default defineEventHandler(async (event) => {
 
   if (event.req.method === 'PUT') {
     const body = await readBody(event)
-
-    if (!body.status) {
+    const { status } = body
+    console.log(status)
+    if (!status) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Missing required status field',
@@ -44,6 +45,7 @@ export default defineEventHandler(async (event) => {
       })
       return updatedOrder
     } catch (error) {
+      console.error(error)
       throw createError({
         statusCode: 400,
         statusMessage: 'Failed to update order',

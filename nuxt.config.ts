@@ -19,4 +19,8 @@ export default defineNuxtConfig({
     },
     googleServiceAccountJson: process.env.GOOGLE_SERVICE_ACCOUNT_JSON || ''
   },
+  colorMode: {
+    preference: 'light',
+    fallback: 'light' // fallback if system preference can't be detected
+  }
 })

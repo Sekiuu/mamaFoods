@@ -12,33 +12,30 @@ const props = defineProps<{
 </script>
 
 <template>
-    <div>
-        <!-- food image-->
-        <div class="h-48 overflow-hidden bg-gray-200 relative">
-            <div class="w-full h-full flex items-center justify-center text-gray-400">
-                <img :src="props.item.icon ?? ''" :alt="props.item.icon ?? ''" class="object-cover w-full h-full" />
-            </div>
-            <!-- price tag-->
+    <UCard :ui="{ body: 'p-0', root: 'overflow-hidden' }">
+        <!-- Food Image -->
+        <div class="h-48 relative overflow-hidden bg-gray-200 rounded-2xl">
+            <img :src="props.item.icon ?? ''" :alt="props.item.name ?? ''" class="object-cover w-full h-full" />
+            <!-- Price Tag -->
             <div
                 class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full font-bold text-orange-600 shadow-sm">
                 ฿{{ props.item.price }}
             </div>
         </div>
-        <!-- food details -->
-        <div class="p-6 whitespace-break-spaces break-all">
-            <h3 class="text-xl font-bold text-gray-800 mb-1">{{ props.item.name }}</h3>
-            <p class="text-gray-500 text-sm mb-6">{{ props.item.description }}</p>
 
-            <div class="flex items-center justify-between">
-                <!-- add to cart button-->
-                <span v-if="props.addToCart" class="text-sm font-medium text-gray-400">
+        <!-- Food Details -->
+        <div class="p-6 whitespace-break-spaces break-all">
+            <h3 class="text-xl font-bold mb-1">{{ props.item.name }}</h3>
+            <p class="text-sm text-muted mb-6">{{ props.item.description }}</p>
+
+            <div v-if="props.addToCart" class="flex items-center justify-between">
+                <span class="text-sm font-medium text-muted">
                     {{ $t('food.addToCart') }}
                 </span>
-                <button v-if="props.addToCart" @click="props.addToCart(props.item)"
-                    class="hover:cursor-pointer bg-orange-500 hover:bg-orange-600 text-white w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90 shadow-lg shadow-orange-200">
-                    <span class="text-xl font-bold">+</span>
-                </button>
+                <UButton color="warning" icon="i-lucide-plus" size="lg"
+                    class="rounded-xl shadow-lg shadow-orange-200 active:scale-90 transition-all"
+                    @click="props.addToCart(props.item)" />
             </div>
         </div>
-    </div>
+    </UCard>
 </template>

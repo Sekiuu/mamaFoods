@@ -5,7 +5,7 @@
             <div class="grid gap-6" :style="gridStyle">
                 <div v-for="item in foods" :key="item.id"
                     class="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
-                    <FoodCard :item="item" />
+                    <FoodCard :item="item" :addToCart="addToCart" />
                 </div>
             </div>
         </div>
@@ -20,6 +20,7 @@ const DEFAULT_COLS = 3;
 
 const props = defineProps<{
     foods: FoodItem[];
+    addToCart?: (item : FoodItem) => void;
     gridCols?: number;
 }>();
 

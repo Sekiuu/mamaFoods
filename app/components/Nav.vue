@@ -21,6 +21,7 @@
             Admin
           </NuxtLink>
           <LangSwitch />
+          <ThemeSwitch />
         </div>
       </div>
     </div>

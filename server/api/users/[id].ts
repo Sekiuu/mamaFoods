@@ -29,17 +29,20 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const name = typeof body?.name === 'string' ? body.name.trim() : undefined
     const password = typeof body?.password === 'string' ? body.password : undefined
+    const role = typeof body?.role === 'string' ? body.role : ''
 
     try {
-      const data: { name?: string; password?: string } = {}
+      const data: { name?: string; password?: string, role?: string } = {}
       if (name) data.name = name
       if (password && password.length > 0) data.password = await hash(password)
+      if(role) data.role = role
 
       const updated = await prisma.users.update({
         where: { id },
         data,
-        select: { id: true, name: true, create_at: true },
+        select: { id: true, name: true, role: true, create_at: true },
       })
+      console.log(updated)
       return updated
     } catch {
       throw createError({

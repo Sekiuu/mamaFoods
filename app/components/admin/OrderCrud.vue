@@ -44,6 +44,7 @@
                                     <option value="cancelled">Cancelled</option>
                                     <option value="preparing">Preparing</option>
                                     <option value="delivering">Delivering</option>
+                                    <option value="delivered">Delivered (Awaiting Confirm)</option>
                                     <option value="completed">Completed</option>
                                 </select>
                             </td>
