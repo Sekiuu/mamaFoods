@@ -6,9 +6,16 @@ export default defineEventHandler(async (event) => {
   const fileId = getRouterParam(event, 'id')
   const config = useRuntimeConfig(event)
 
-// ดึง JSON String จาก Env และแปลงกลับเป็น Object
-  const serviceAccount = JSON.parse(config.googleServiceAccountJson)
-const auth = new google.auth.GoogleAuth({
+  // ดึง JSON String จาก Env และแปลงกลับเป็น Object
+  const googleServiceAccountJson = config.googleServiceAccountJson.trim()
+  if (!googleServiceAccountJson || googleServiceAccountJson.length === 0) {
+    createError({
+      statusCode: 400,
+      statusMessage: 'Missing googleServiceAccountJson in .env file'
+    })
+  }
+  const serviceAccount = JSON.parse(googleServiceAccountJson)
+  const auth = new google.auth.GoogleAuth({
     // เปลี่ยนจาก keyFile เป็น credentials
     credentials: {
       client_email: serviceAccount.client_email,
@@ -34,10 +41,11 @@ const auth = new google.auth.GoogleAuth({
     // 3. ป้องกัน Error "undefined" ด้วยการใส่ค่า Default หรือใช้จาก Metadata
     // set Content-Type (ect. image/jpeg, image/png)
     const contentType = fileMetadata.data.mimeType || 'image/jpeg'
-
+    // set content-type to response
     setResponseHeader(event, 'Content-Type', contentType)
+    // set Cache-Control (Cace imgae for 1 hour)
     setResponseHeader(event, 'Cache-Control', 'public, max-age=3600')
-
+    // sent as stream( file stream )
     return sendStream(event, response.data)
 
   } catch (error: any) {
