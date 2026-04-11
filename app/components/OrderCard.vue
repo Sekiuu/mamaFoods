@@ -117,8 +117,7 @@ import QRCode from 'qrcode'
 import type { Order, CartItem } from '~/types'
 import { OrderStatus } from '~/types/orders'
 import { useRouter } from 'vue-router'
-import { V } from 'vue-router/dist/index-BzEKChPW.js'
-const { locale: currentLocale } = useI18n()
+const { locale: currentLocale, t: $t} = useI18n()
 const router = useRouter()
 
 

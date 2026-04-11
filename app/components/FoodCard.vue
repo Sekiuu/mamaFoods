@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { t } = useI18n()
+
 const props = defineProps<{
     item: {
         id: number
@@ -30,7 +32,7 @@ const props = defineProps<{
 
             <div v-if="props.addToCart" class="flex items-center justify-between">
                 <span class="text-sm font-medium text-muted">
-                    {{ $t('food.addToCart') }}
+                    {{ t('food.addToCart') }}
                 </span>
                 <UButton color="warning" icon="i-lucide-plus" size="lg"
                     class="rounded-xl shadow-lg shadow-orange-200 active:scale-90 transition-all"
