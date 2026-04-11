@@ -8,9 +8,11 @@
         </UPageHeader>
 
         <!-- Loading Spinner -->
-        <UPageCard v-if="loading" class="flex justify-center items-center h-64">
-            <UIcon name="i-lucide-loader-circle" class="size-12 text-warning animate-spin" />
-        </UPageCard>
+        <UPageBody v-if="loading">
+            <div class="flex justify-center items-center h-64 w-full">
+                <UIcon name="i-lucide-loader-circle" class="size-12 text-warning animate-spin" />
+            </div>
+        </UPageBody>
 
         <UPageBody v-else class="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
@@ -72,13 +74,14 @@
 </template>
 
 
-
 <script setup lang="ts">
+import type { FoodItem } from '~/types'
+
+const { t: $t } = useI18n()
 const CART_KEY = process.env.CART_KEY || 'mamaFoodCart'
 const router = useRouter()
 const cartCookie = useCookie<CartItem[] | null>(CART_KEY)
 const loading = ref(false)
-import type { FoodItem } from '~/types'
 
 interface CartItem extends FoodItem {
     quantity: number
