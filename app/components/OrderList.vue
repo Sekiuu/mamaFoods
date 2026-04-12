@@ -1,51 +1,62 @@
-<template>
-    <div>
-        <div v-if="activeOrders.length === 0" class="rounded-3xl bg-white p-10 shadow-sm border border-gray-100 text-center">
-            <p class="text-gray-500">
-                {{ $t('orderList.empty') }}
-            </p>
-        </div>
-
-        <div v-else class="space-y-4">
-            <!-- Order Cards -->
-            <div v-for="order in activeOrders" :key="order.id"
-                class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div>
-                        <p class="text-sm text-gray-500">Order ID</p>
-                        <h2 class="text-xl font-semibold text-gray-900">#{{ order.id }}</h2>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm text-gray-500">Total</p>
-                        <p class="text-lg font-bold text-orange-600">฿{{ order.total_price }}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm text-gray-500">Status</p>
-                        <OrderStatusTag :status="order.status" />
-                    </div>
-                </div>
-                <div class="mt-4 flex flex-wrap gap-3 items-center justify-between">
-                    <p class="text-sm text-gray-500">Created: {{ formatDate(order.create_at) }}</p>
-                    <NuxtLink :to="`/myOrders/${order.id}`"
-                        class="inline-flex items-center rounded-2xl bg-orange-600 px-4 py-2 text-white hover:bg-orange-700 transition">
-                        {{ $t('orderList.viewDetails') }}
-                    </NuxtLink>
-                </div>
-            </div>
-        </div>
-    </div>
-
-</template>
-
 <script setup lang="ts">
 import type { Order } from '~/types'
-
+import { OrderStatus, PaymentStatus } from '~/types/orders'
 const props = defineProps<{
     orders: Order[]
     formatDate: (value: string | Date | null) => string
-    filterStatus: string[]
+    filterStatus: Array<OrderStatus | PaymentStatus>
 }>()
 
-const activeOrders = computed(() => props.orders.filter(o => !props.filterStatus.includes(o.status)))
+const activeOrders = computed(() => props.orders.filter( o => 
+    props.filterStatus.includes(o.status) || 
+    props.filterStatus.includes(o.payment_status)))
 
 </script>
+
+<template>
+    <!-- Empty state -->
+    <UCard v-if="activeOrders.length === 0" class="text-center py-10">
+        <p class="text-muted">{{ $t('orderList.empty') }}</p>
+    </UCard>
+
+    <!-- Order list -->
+    <UCard v-else v-for="order in activeOrders" :key="order.id">
+        <!-- Header: Order ID + Total + Status -->
+        <template #header>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <!-- Order ID -->
+                <div>
+                    <p class="text-sm text-muted">Order ID</p>
+                    <p class="text-xl font-semibold">#{{ order.id }}</p>
+                </div>
+
+                <!-- Total -->
+                <div class="sm:text-right">
+                    <p class="text-sm text-muted">Total</p>
+                    <p class="text-lg font-bold text-primary">฿{{ order.total_price }}</p>
+                </div>
+
+                <!-- Status Badge -->
+                <div class="sm:text-right">
+                    <p class="text-sm text-muted mb-1">Status</p>
+                    <OrderStatusTag :status="order.status" />
+                </div>
+            </div>
+        </template>
+
+        <!-- Footer: Date + View Details -->
+        <template #footer>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 text-sm text-muted">
+                    <UIcon name="i-lucide-calendar" class="size-4" />
+                    <span>{{ formatDate(order.create_at) }}</span>
+                </div>
+
+                <UButton :to="`/myOrders/${order.id}`" color="primary" variant="solid"
+                    trailing-icon="i-lucide-arrow-right">
+                    {{ $t('orderList.viewDetails') }}
+                </UButton>
+            </div>
+        </template>
+    </UCard>
+</template>

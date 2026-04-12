@@ -6,9 +6,14 @@
       color: 'primary',
       variant: 'soft',
       onClick: orderNow,
-      trailingIcon: 'i-lucide-arrow-right'
+      trailingIcon: 'i-lucide-arrow-right',
+      activeVariant: 'subtle',
+      activeColor: 'secondary',
+      class:'hover:cursor-pointer hover:scale-125 transition-all duration-300'
     }
-  ]" />
+  ]" 
+  class="mx-auto"
+  />
 </template>
 
 <script setup lang="ts">

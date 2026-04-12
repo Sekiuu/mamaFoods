@@ -10,6 +10,7 @@ export type OrderResponse = {
   items: string | null
   total_price: string | null
   status: string | null
+  payment_status: string | null
   create_at: Date | null
 }
 

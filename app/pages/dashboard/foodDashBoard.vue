@@ -1,13 +1,7 @@
 <template>
-    <PageHeader title="Order Dashboard" :enable-logout="false">
-        <template #actions>
-            <NuxtLink to="/admin" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md mr-4">
-                Back to Dashboard
-            </NuxtLink>
-        </template>
-    </PageHeader>
+    <AdminHeader title="Food Dashboard" :enable-back="true" />
 
-    <main class="admin-dashboard">
+    <UPage>
         <div class="container mx-auto px-4 py-8">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Left Column: Form -->
@@ -18,14 +12,14 @@
                 <!-- Right Column: List -->
                 <div class="lg:col-span-2">
                     <!-- Header -->
-                    <UBadge class="flex gap-3 overflow-visible">
+                    <UPageHeader class="mb-4 gap-4" >
                         <!-- View Mode Options -->
                         <USelect v-model="viewMode" placeholder="View Mode" :items="[
                             { label: 'Table', value: 'table' },
                             { label: 'Grid', value: 'grid' },
                             ]"
                             @change="handleViewModeChange" 
-                            class="w-1/2"/>
+                            class="w-fit mx-2"/>
                         <!-- grid options -->
                         <USelect v-if="viewMode === 'grid'" v-model.number="gridCols" title="Grid Collums"
                             placeholder="Grid Collums" :items="[
@@ -33,13 +27,13 @@
                                 { label: '3 collums', value: 3 }, 
                                 { label: '4 collums', value: 4 }]"
                             @change="(e: any) => gridCols = parseInt(e.target.value) || 3"
-                            class="w-1/2" />
-                    </UBadge>
+                            class="w-fit mx-2" />
+                    </UPageHeader>
                     <!-- Food List -->
                     <UAlert color="info" variant="soft" v-if="isLoading" title="Loading..." class="text-center py-8" />
                     <FoodListTable v-else-if="viewMode === 'table'" :foods="foods" @edit="startEdit"
                         @delete="openDeleteDialog" />
-                    <FoodListGrid v-else :foods="foods" :grid-cols="gridCols" @edit="startEdit"
+                    <FoodGrid v-else :foods="foods" :grid-cols="gridCols" @edit="startEdit"
                         @delete="openDeleteDialog" />
                 </div>
 
@@ -48,7 +42,7 @@
 
         <!-- Delete Confirmation Dialog -->
         <FoodDelete :food="foodToDelete" @food-deleted="loadFoods" @close="foodToDelete = null" />
-    </main>
+    </UPage>
 </template>
 
 <script setup lang="ts">
@@ -56,6 +50,7 @@ import FoodForm from '~/components/admin/FoodForm.vue'
 import FoodListTable from '~/components/admin/FoodListTable.vue'
 import FoodDelete from '~/components/admin/FoodDelete.vue'
 import PageHeader from '~/components/admin/AdminHeader.vue'
+import AdminHeader from '~/components/admin/AdminHeader.vue';
 
 interface Food {
     id: number;

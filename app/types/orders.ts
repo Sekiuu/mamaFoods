@@ -15,7 +15,8 @@ export interface Order {
     customer_note: string | null
     items: string | null
     total_price: string | null
-    status: "pending"| "confirmed" | "cancelled" | "preparing" | "delivering" | "delivered" | "completed"
+    payment_status: PaymentStatus
+    status: OrderStatus
     create_at: Date | string | null
 }
 export enum OrderStatus {
@@ -26,6 +27,10 @@ export enum OrderStatus {
     Delivering = "delivering",
     Delivered = "delivered",
     Completed = "completed",
+}
+export enum PaymentStatus {
+    Unpaid = "unpaid",
+    Paid = "paid",
 }
 export interface OrderWithParsedItems extends Order {
     parsedItems: CartItem[]

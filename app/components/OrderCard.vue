@@ -1,250 +1,230 @@
-<template>
-  <div class="rounded-3xl border border-gray-100 p-8 shadow-sm"
-    :class="statusColor(order ? orderStatus : OrderStatus.Pending)">
-    <!-- Header and Order Summary -->
-    <div class="mb-8 grid gap-6 lg:grid-cols-2">
-      <div class="space-y-3">
-        <p class="text-sm text-gray-500">
-          {{ $t("orderCard.orderId") }} #{{ order.value.id }}
-        </p>
-        <h2 class="text-3xl font-bold text-gray-900 mt-2">
-          {{ $t("orderCard.orderSummary") }}
-        </h2>
-        <p>{{ $t("order.status.title") }}:
-          <OrderStatusTag :status="orderStatus" class="w-fit inline-block" />
-        </p>
-      </div>
-      <div class="space-y-3 text-right">
-        <p class="text-sm text-gray-500">
-          {{ $t("orderCard.orderDate") }}
-        </p>
-        <p class="text-lg font-semibold text-gray-900">{{ formattedDate }}</p>
-        <p class="text-sm text-gray-500">
-          {{ $t("customerInfo.phone") }}
-        </p>
-        <p class="text-base text-gray-700">{{ order.value.customer_phone }}</p>
-      </div>
-    </div>
-    <!-- Order Items -->
-    <div class="space-y-4">
-      <div v-for="item in orderItems" :key="item.id" class="rounded-3xl bg-gray-50/50 p-4">
-        <div class="flex items-center justify-between gap-4">
-          <div>
-            <p class="font-semibold text-gray-900">{{ item.name }}</p>
-            <p class="text-sm text-gray-500">{{ item.description }}</p>
-          </div>
-          <div class="text-right">
-            <p class="font-semibold text-gray-900">฿{{ item.price * item.quantity }}</p>
-            <p class="text-sm text-gray-500">{{ item.quantity }} x ฿{{ item.price }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Order Total and Address -->
-    <div class="mt-6 border-t border-gray-200 pt-6">
-      <div class="flex items-center justify-between">
-        <span class="text-lg font-semibold text-gray-900">
-          {{ $t("shop.cart.total") }}
-        </span>
-        <span class="text-2xl font-bold text-orange-600">฿{{ order.value.total_price }}</span>
-      </div>
-      <p class="text-sm text-gray-500 mt-1">
-        {{ $t("customerInfo.address") }} : {{ order.value.customer_address }}</p>
-      <p class="text-sm text-gray-500">
-        {{ $t("customerInfo.note") }} : {{ order.value.customer_note || 'None' }}</p>
-    </div>
-
-    <!-- Payment QR Code -->
-    <div v-if="orderStatus === OrderStatus.Pending" class="mt-8">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">
-        {{ $t("payment.qrCode.title") }}
-      </h3>
-      <div v-if="qrDataUrl" class="rounded-3xl bg-gray-50/25 p-6 text-center">
-        <img :src="qrDataUrl" alt="PromptPay QR Code" class="mx-auto h-64 w-64" />
-        <p class="mt-4 text-sm text-gray-500">
-          {{ $t("payment.qrCode.desc") }}
-        </p>
-      </div>
-      <div v-else class="rounded-3xl bg-gray-50 p-6 text-center text-gray-500">
-        {{ $t("payment.qrCode.loading") }}
-      </div>
-    </div>
-
-    <!-- Success State: Rating & Review -->
-    <div v-if="orderStatus === OrderStatus.Completed" class="mt-8">
-      <div class="bg-green-50 border border-green-100 rounded-2xl p-6 text-center">
-        <div
-          class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 text-green-600 text-2xl font-bold">
-          ✓
-        </div>
-        <h3 class="text-lg font-bold text-gray-900 mb-1">
-          {{ $t("orderCard.completed") }}
-        </h3>
-        <p class="text-sm text-gray-500 mb-4">{{ $t("orderCard.ratingAndReviewDesc") }}</p>
-        <!-- Rating and Review Button (coming soon) -->
-        <button v-if="false"
-          class="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-xl font-semibold transition-colors">
-          <span>⭐</span>
-          {{ $t("orderCard.ratingAndReview") }}
-        </button>
-      </div>
-    </div>
-
-    <!-- Cancel Order Button -->
-    <div v-if="cancelable" class="mt-8">
-      <button @click="onCancleOrder"
-        class="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-2xl transition-colors">
-        {{ $t("orderCard.cancelOrder") }}
-      </button>
-    </div>
-
-    <!-- Confirmation Modal -->
-    <UContainer v-if="showConfirmBlock" class="mt-8 bg-amber-500/20 rounded-3xl">
-      <div class="p-6">
-        <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $t("order.status.delivered") }}</h3>
-        <p class="text-gray-500 mb-6">{{ $t("orderCard.confirmReceiptDesc") }}</p>
-        <UButton color="info" block class="flex-1 py-3" :loading="isConfirming" @click="onConfirmOrder">
-          {{ $t("orderCard.confirmReceipt") }}
-        </UButton>
-      </div>
-    </UContainer>
-
-  </div>
-</template>
-
 <script setup lang="ts">
 import QRCode from 'qrcode'
 import type { Order, CartItem } from '~/types'
-import { OrderStatus } from '~/types/orders'
-import { useRouter } from 'vue-router'
-const { locale: currentLocale, t: $t} = useI18n()
-const router = useRouter()
+import { OrderStatus, PaymentStatus } from '~/types/orders'
+import generatePayload from 'promptpay-qr'
 
+const { locale: currentLocale, t: $t } = useI18n()
+const toast = useToast()
+const config = useRuntimeConfig()
 
 const props = defineProps<{
   order: Ref<Order>
   cancelable: boolean
 }>()
+
 const qrDataUrl = ref('')
 const isConfirming = ref(false)
-const showConfirmModal = ref(false)
-const orderStatus = computed(() => props.order.value.status)
+const isGeneratingQR = ref(false)
 
-const showConfirmBlock = computed(() => {
-  return orderStatus.value === OrderStatus.Delivered && !isConfirming.value
-})
+const orderStatus = computed(() => props.order.value.status)
+const paymentStatus = computed(() => props.order.value.payment_status)
+const showConfirmBlock = computed(() =>
+  orderStatus.value === OrderStatus.Delivered && !isConfirming.value
+)
+
 const orderItems = computed<CartItem[]>(() => {
-  if (!props.order.value.items) {
-    return []
-  }
+  if (!props.order.value.items) return []
   try {
     return JSON.parse(props.order.value.items)
   } catch {
     return []
   }
 })
-const statusColor = (status: string) => {
-  if (status === OrderStatus.Pending) return 'bg-orange-100'
-  if (status === 'delivered') return 'bg-green-100'
-  if (status === OrderStatus.Cancelled) return 'bg-red-200'
-  return 'bg-blue-100'
-}
+
 const formattedDate = computed(() => {
   if (!props.order.value.create_at) return 'Unknown'
-  const date = new Date(props.order.value.create_at)
-  return date.toLocaleString(currentLocale.value, { dateStyle: 'medium', timeStyle: 'short' })
+  return new Date(props.order.value.create_at).toLocaleString(currentLocale.value, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  })
 })
 
-const cancelable = computed(() => {
-  return props.cancelable && props.order.value.status === OrderStatus.Pending;
-})
+const cancelable = computed(() =>
+  props.cancelable && props.order.value.status === OrderStatus.Pending
+)
 
-const onCancleOrder = async () => {
-  if (!props.order.value.id || !props.order) return
+const statusConfig = useStatusConfig()
+const currentStatus = computed(() =>
+  statusConfig[orderStatus.value]
+)
+
+// Actions
+const onCancelOrder = async () => {
+  if (!props.order.value.id) return
   try {
-    const payload = {
-      ...props.order,
-      status: OrderStatus.Cancelled,
-    }
-    const order = await $fetch(`/api/orders/${props.order.value.id}`, {
+    await $fetch(`/api/orders/${props.order.value.id}`, {
       method: 'PUT',
-      body: payload,
+      body: { ...props.order.value, status: OrderStatus.Cancelled },
     })
-    alert('Order cancelled successfully.')
-  } catch (error) {
-    console.error('Failed to cancel order:', error)
-    alert('Failed to cancel order. Please try again.')
-  }
-  finally {
-    router.push('/myOrder')
+    toast.add({ title: $t('orderCard.cancelOrder'), color: 'success', icon: 'i-lucide-check-circle' })
+    navigateTo('/myOrders')
+  } catch {
+    toast.add({ title: 'Failed to cancel order', color: 'error', icon: 'i-lucide-x-circle' })
   }
 }
 
 const onConfirmOrder = async () => {
-  if (!props.order.value.id || !props.order) return
+  if (!props.order.value.id) return
   isConfirming.value = true
   try {
-    const { id, ...orderData } = props.order.value;
-    const payload = {
-      ...orderData,
-      status: OrderStatus.Completed,
-    }
-    // console.log(payload)
-    await $fetch(`/api/orders/${props.order.value.id}`, {
+    const { id, ...orderData } = props.order.value
+    await $fetch(`/api/orders/${id}`, {
       method: 'PUT',
-      body: payload,
+      body: { ...orderData, status: OrderStatus.Completed },
     })
-    // showConfirmModal.value = false
-    router.go(0) // รีเฟรชหน้าเพื่ออัปเดตสถานะล่าสุด
-  } catch (error) {
-    console.error('Failed to confirm order:', error)
+  } catch {
+    toast.add({ title: 'Failed to confirm order', color: 'error', icon: 'i-lucide-x-circle' })
   } finally {
     isConfirming.value = false
   }
 }
 
 const generateQr = async () => {
-  const phone = process.env.PROMPTPAY_PHONE || '0929853209';
+  if (qrDataUrl.value.length > 0) {
+    console.log('QR code already generated')
+    return
+  }
+
+  const phone = config.public.promptpayPhone ?? undefined
+  if (!phone) {
+    console.error('PromptPay phone is not configured in public runtimeConfig')
+    return
+  }
   try {
-    const promptpayModule = await import('promptpay-qr')
-    const generatePayload = promptpayModule.default || promptpayModule
-    const payload = generatePayload(phone, {
-      amount: Number(props.order.value.total_price) || 0,
-    })
+    isGeneratingQR.value = true
+    const payload = generatePayload(phone as string, { amount: Number(props.order.value.total_price) || 0 })
     qrDataUrl.value = await QRCode.toDataURL(payload)
   } catch (error) {
     console.error('Failed to generate PromptPay QR:', error)
+  } finally {
+    isGeneratingQR.value = false
   }
 }
 
-onMounted(() => {
-  if (orderStatus.value === OrderStatus.Pending) generateQr
+onMounted(async () => {
+  if (paymentStatus.value !== PaymentStatus.Paid) await generateQr()
 })
-watch(orderStatus, (newValue: string) => {
-  console.log(newValue)
-  if (newValue === OrderStatus.Delivered) {
-    useToast().add({
+
+watch(orderStatus, (newValue) => {
+  const orderStatus = newValue
+
+  if (orderStatus === OrderStatus.Delivered) {
+    toast.add({
       title: $t('order.status.delivered'),
       description: `${$t('order.status.delivered')} ${$t('orderCard.confirmReceiptDesc')}`,
       color: 'success',
-      icon: 'i-heroicons-check-circle',
+      icon: 'i-lucide-check-circle',
     })
   }
-  if (newValue === OrderStatus.Completed) {
-    useToast().add({
-      title: `${$t('order.title}')}${$t('order.status.completed}')}`,
+  if (orderStatus === OrderStatus.Completed) {
+    toast.add({
+      title: `${$t('order.title')} ${$t('order.status.completed')}`,
       description: $t('orderCard.completetOrderThnakyou'),
       color: 'success',
-      icon: 'i-heroicons-check-circle',
+      icon: 'i-lucide-check-circle',
     })
   }
-  if (orderStatus.value === OrderStatus.Pending) generateQr()
 })
-
 </script>
 
-<style scoped>
-img {
-  max-width: 100%;
-}
-</style>
+<template>
+  <UCard :color="currentStatus?.color" variant="soft">
+
+    <!-- ── Header: Order ID + Date ── -->
+    <template #header>
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <p class="text-sm text-muted">{{ $t('orderCard.orderId') }} #{{ order.value.id }}</p>
+          <p class="text-2xl font-bold">{{ $t('orderCard.orderSummary') }}</p>
+        </div>
+        <div class="sm:text-right space-y-1">
+          <p class="text-sm text-muted">{{ $t('orderCard.orderDate') }}</p>
+          <p class="font-semibold">{{ formattedDate }}</p>
+          <p class="text-sm text-muted">{{ $t('customerInfo.phone') }}</p>
+          <p>{{ order.value.customer_phone }}</p>
+        </div>
+      </div>
+
+      <!-- Status badge -->
+      <div class="mt-3 flex items-center gap-2">
+        <span class="text-sm text-muted">{{ $t('order.status.title') }}:</span>
+        <OrderStatusTag :status="orderStatus" />
+      </div>
+    </template>
+
+    <!-- ── Body: Order Items ── -->
+    <div class="space-y-3">
+      <UCard v-for="item in orderItems" :key="item.id" variant="subtle">
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <p class="font-semibold">{{ item.name }}</p>
+            <p class="text-sm text-muted">{{ item.description }}</p>
+          </div>
+          <div class="text-right shrink-0">
+            <p class="font-semibold">฿{{ item.price * item.quantity }}</p>
+            <p class="text-sm text-muted">{{ item.quantity }} × ฿{{ item.price }}</p>
+          </div>
+        </div>
+      </UCard>
+    </div>
+
+    <!-- ── Footer: Total, Address, Actions ── -->
+    <template #footer>
+      <!-- Total -->
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-lg font-semibold">{{ $t('shop.cart.total') }}</span>
+        <span class="text-2xl font-bold text-primary">฿{{ order.value.total_price }}</span>
+      </div>
+
+      <!-- Address & Note -->
+      <div class="space-y-1 text-sm text-muted mb-4">
+        <p>
+          <UIcon name="i-lucide-map-pin" class="inline size-4 mr-1" />
+          {{ $t('customerInfo.address') }}: {{ order.value.customer_address }}
+        </p>
+        <p>
+          <UIcon name="i-lucide-notebook-pen" class="inline size-4 mr-1" />
+          {{ $t('customerInfo.note') }}: {{ order.value.customer_note || 'None' }}
+        </p>
+      </div>
+
+      <USeparator class="mb-4" />
+
+      <!-- Payment QR Code -->
+      <div v-if="paymentStatus !== PaymentStatus.Paid" class="mb-4">
+        <p class="text-lg font-semibold mb-3">{{ $t('payment.qrCode.title') }}</p>
+        <UCard variant="subtle" class="text-center" v-if="!isGeneratingQR">
+          <img :src="qrDataUrl" alt="PromptPay QR Code" class="mx-auto h-64 w-64" />
+          <p class="mt-3 text-sm text-muted">{{ $t('payment.qrCode.desc') }}</p>
+        </UCard>
+        <UCard variant="subtle" class="text-center text-muted" v-else>
+          <div class="flex items-center justify-center gap-2 py-4">
+            <UIcon name="i-lucide-loader-circle" class="size-5 animate-spin" />
+            {{ $t('payment.qrCode.loading') }}...
+          </div>
+        </UCard>
+      </div>
+
+      <!-- Completed state -->
+      <UAlert v-if="orderStatus === OrderStatus.Completed" color="success" variant="subtle" icon="i-lucide-check-circle"
+        :title="$t('orderCard.completed')" :description="$t('orderCard.ratingAndReviewDesc')" class="mb-4" />
+
+      <!-- Delivery confirmation -->
+      <UAlert v-if="showConfirmBlock" color="warning" variant="subtle" icon="i-lucide-package-check"
+        :title="$t('order.status.delivered')" :description="$t('orderCard.confirmReceiptDesc')" orientation="horizontal"
+        :actions="[{
+          label: $t('orderCard.confirmReceipt'),
+          color: 'success',
+          loading: isConfirming,
+          onClick: onConfirmOrder,
+        }]" class="mb-4" />
+
+      <!-- Cancel button -->
+      <UButton v-if="cancelable" color="error" variant="solid" block icon="i-lucide-x" @click="onCancelOrder">
+        {{ $t('orderCard.cancelOrder') }}
+      </UButton>
+    </template>
+
+  </UCard>
+</template>

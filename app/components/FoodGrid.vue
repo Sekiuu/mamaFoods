@@ -1,39 +1,44 @@
 <template>
-    <div class="food-list-container">
-        <h2 class="text-2xl font-bold mb-4">Food Items</h2>
-        <div class="overflow-x-auto">
-            <div class="grid gap-6" :style="gridStyle">
-                <div v-for="item in foods" :key="item.id"
-                    class="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
-                    <FoodCard :item="item" :addToCart="addToCart" />
-                </div>
-            </div>
+    <div class="space-y-4">
+        <h2 v-if="title" class="text-2xl font-bold">{{ title }}</h2>
+
+        <div class="grid gap-6" :class="gridClass">
+            <FoodCard v-for="item in foods" :key="item.id" :item="item" :add-to-cart="addToCart" />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import type { FoodItem } from "~/types"
+import type { FoodItem } from '~/types'
 
-const DEFAULT_COLS = 3;
+const DEFAULT_COLS = 3
 
 const props = defineProps<{
-    foods: FoodItem[];
-    addToCart?: (item : FoodItem) => void;
-    gridCols?: number;
-}>();
-
-const cols = computed(() => {
-    return props.gridCols && props.gridCols > 0 ? props.gridCols : DEFAULT_COLS;
-});
-
-const gridStyle = computed(() => ({
-    gridTemplateColumns: `repeat(${cols.value}, minmax(0, 1fr))`,
-}));
+    foods: FoodItem[]
+    addToCart?: (item: FoodItem) => void
+    gridCols?: number
+    title?: string
+}>()
 
 defineEmits<{
-    edit: [food: FoodItem];
-    delete: [id: number];
-}>();
+    edit: [food: FoodItem]
+    delete: [id: number]
+}>()
+
+const cols = computed(() => {
+    return props.gridCols && props.gridCols > 0 ? props.gridCols : DEFAULT_COLS
+})
+
+// Responsive: always 1 col on mobile, 2 on tablet, gridCols on desktop
+const gridClass = computed(() => {
+    const desktopCols: Record<number, string> = {
+        1: 'grid-cols-1',
+        2: 'sm:grid-cols-2',
+        3: 'sm:grid-cols-2 lg:grid-cols-3 grid-cols-1',
+        4: 'sm:grid-cols-2 lg:grid-cols-4 grid-cols-1',
+        5: 'sm:grid-cols-2 lg:grid-cols-5 grid-cols-1',
+        6: 'sm:grid-cols-2 lg:grid-cols-6 grid-cols-1',
+    }
+    return desktopCols[cols.value] ?? 'sm:grid-cols-2 lg:grid-cols-3 grid-cols-1'
+})
 </script>

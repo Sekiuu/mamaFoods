@@ -1,36 +1,54 @@
-<template>
-  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16 items-center">
-        <!-- Logo -->
-        <div class="flex items-center">
-          <NuxtLink to="/" class="text-xl font-bold text-orange-600 tracking-tight hover:opacity-80 transition-opacity">
-            {{title}}
-          </NuxtLink>
-        </div>
-
-        <!-- Navigation Links -->
-        <div class="flex items-center gap-6">
-          <NuxtLink to="/shop" class="text-sm hover:cursor-pointer font-medium text-gray-600 hover:text-orange-600 transition-colors">
-            {{ $t("nav.menu") }}
-          </NuxtLink>
-          <NuxtLink to="/myOrders" class="text-sm hover:cursor-pointer font-medium text-gray-600 hover:text-orange-600 transition-colors">
-            {{ $t("nav.myOrders") }}
-          </NuxtLink>
-          <NuxtLink v-if="enableAdmin" to="/admin" class="hover:cursor-pointer text-xs font-semibold text-gray-400 hover:text-gray-900 uppercase tracking-wider transition-colors ml-4">
-            Admin
-          </NuxtLink>
-          <LangSwitch />
-          <ThemeSwitch />
-        </div>
-      </div>
-    </div>
-  </nav>
-</template>
-
 <script setup lang="ts">
-defineProps<{
-    title: string;
-    enableAdmin: boolean;
+import type { NavigationMenuItem } from '@nuxt/ui'
+
+const props = defineProps<{
+  title: string
+  showDashBoard: boolean
 }>()
+
+const { t } = useI18n()
+
+const navItems = computed<NavigationMenuItem[]>(() => {
+  const items: NavigationMenuItem[] = [
+    { label: t('nav.menu'), to: '/shop', icon: 'material-symbols:shopping-cart-outline-sharp' },
+    { label: t('nav.myOrders'), to: '/myOrders', icon: 'material-symbols:receipt-long-rounded' },
+  ]
+  if (props.showDashBoard) {
+    items.push({ label: 'Dashboard', to: '/dashboard', icon: 'material-symbols:admin-panel-settings' })
+  }
+  return items
+})
 </script>
+
+<template>
+  <UHeader :to="'/'" :title="title" class="transition-300">
+
+    <!-- Logo -->
+    <template #title>
+      <span class="text-xl font-bold text-warning tracking-tight">
+        {{ title }}
+      </span>
+    </template>
+
+    <!-- Center nav links (desktop) -->
+    <UNavigationMenu color="info" :items="navItems" highlight />
+
+    <!-- Right side actions -->
+    <template #right>
+      <div class="hidden md:flex items-center gap-2">
+        <LangSwitch />
+        <ThemeSwitch />
+      </div>
+    </template>
+
+    <!-- Mobile menu body -->
+    <template #body>
+      <UNavigationMenu color="primary" :items="navItems" orientation="vertical" class="-mx-2.5" />
+      <div class="flex items-center gap-2 mt-4 px-2">
+        <LangSwitch />
+        <ThemeSwitch />
+      </div>
+    </template>
+
+  </UHeader>
+</template>

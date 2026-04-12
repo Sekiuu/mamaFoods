@@ -1,13 +1,12 @@
-<template>
-    <div class="px-3 py-1 rounded-full text-white text-sm font-medium " :class="statusColors[status]">
-        {{ $t(`order.status.${status}`) }}
-    </div>
-</template>
-
 <script setup lang="ts">
-import { useStatusColor } from '~/composables/useStatusColor';
-const statusColors = useStatusColor()
-defineProps<{
+import { useStatusConfig } from '~/composables/useStatusConfig';
+const props = defineProps<{
     status: string;
 }>()
+const configof = useStatusConfig()
+const statusConfig = computed(() => configof[props.status]);
 </script>
+<template>
+<UBadge :color="statusConfig?.color"  :icon="statusConfig?.icon"  class="px-3 py-1 rounded-full text-sm font-medium" 
+        :label="$t(`order.status.${status}`)" />
+</template>

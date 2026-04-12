@@ -17,7 +17,10 @@ export default defineNuxtConfig({
     auth: {
       secret: process.env.NUXT_AUTH_SECRET || 'your-secret-key-change-this-in-production'
     },
-    googleServiceAccountJson: process.env.GOOGLE_SERVICE_ACCOUNT_JSON || ''
+    googleServiceAccountJson: process.env.GOOGLE_SERVICE_ACCOUNT_JSON || '',
+    public:{
+      promptpayPhone: process.env.PROMPTPAY_PHONE
+    }
   },
   colorMode: {
     preference: 'light',

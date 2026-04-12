@@ -1,9 +1,9 @@
 <template>
     <UApp>
-        <Nav title="Mama Food" :enable-admin="session.loggedIn.value" />
-        <NuxtPage class="bg-white"/>
+        <Nav title="Mama Food" :showDashBoard="isAdmin || isOperator" />
+        <NuxtPage />
     </UApp>
 </template>
 <script setup lang="ts">
-const session = useUserSession();
+const { isAdmin, isOperator } = useUserAuth();
 </script>

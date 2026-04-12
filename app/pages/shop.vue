@@ -1,79 +1,3 @@
-<template>
-    <UPage class="mx-auto max-w-7xl px-4 py-8">
-
-        <!-- Header -->
-        <UPageHeader class="mb-10">
-            <h1 class="text-4xl font-extrabold">{{ $t('shop.title') }}</h1>
-            <p class="text-muted mt-2">{{ $t('shop.subtitle') }}</p>
-        </UPageHeader>
-
-        <!-- Loading Spinner -->
-        <UPageBody v-if="loading">
-            <div class="flex justify-center items-center h-64 w-full">
-                <UIcon name="i-lucide-loader-circle" class="size-12 text-warning animate-spin" />
-            </div>
-        </UPageBody>
-
-        <UPageBody v-else class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-
-            <!-- Menu Items — takes 2/3 -->
-            <FoodGrid :foods="menuItems" :addToCart="addToCart" class="lg:col-span-3 p-0" />
-
-            <!-- Cart — takes 1/3 -->
-            <div class="lg:col-span-1">
-                <UCard :ui="{ root: 'rounded-3xl sticky top-6' }">
-                    <template #header>
-                        <h2 class="text-2xl font-bold flex items-center gap-2">
-                            {{ $t('shop.cart.title') }}
-                            <span class="text-sm font-normal text-muted">
-                                ({{ totalItems }} {{ $t('shop.cart.items') }})
-                            </span>
-                        </h2>
-                    </template>
-
-                    <!-- Empty Cart -->
-                    <div v-if="cartItems.length === 0" class="py-12 text-center">
-                        <p class="text-4xl mb-4 opacity-20">🍱</p>
-                        <p class="text-muted">{{ $t('shop.cart.empty') }}</p>
-                    </div>
-
-                    <!-- Cart Items -->
-                    <div v-else class="space-y-3">
-                        <div v-for="cartItem in cartItems" :key="cartItem.id"
-                            class="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-3 rounded-2xl">
-                            <div class="min-w-0 mr-2">
-                                <p class="font-bold text-sm truncate">{{ cartItem.name }}</p>
-                                <p class="text-xs text-muted">฿{{ cartItem.price }} x {{ cartItem.quantity }}</p>
-                            </div>
-                            <div class="flex items-center gap-1 shrink-0">
-                                <UButton icon="i-lucide-minus" color="neutral" variant="ghost" size="xs"
-                                    @click="removeFromCart(cartItem.id)" />
-                                <span class="font-mono text-sm w-5 text-center">{{ cartItem.quantity }}</span>
-                                <UButton icon="i-lucide-plus" color="warning" variant="ghost" size="xs"
-                                    @click="addToCart(cartItem)" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Checkout -->
-                    <template v-if="cartItems.length > 0" #footer>
-                        <USeparator class="mb-4" />
-                        <div class="flex justify-between text-lg font-bold mb-4">
-                            <span class="text-muted">{{ $t('shop.cart.total') }}</span>
-                            <span class="text-warning font-mono text-xl">฿{{ totalPrice }}</span>
-                        </div>
-                        <UButton block color="neutral" size="xl" class="rounded-2xl font-bold" @click="checkout">
-                            {{ $t('shop.cart.checkout') }}
-                        </UButton>
-                    </template>
-                </UCard>
-            </div>
-
-        </UPageBody>
-    </UPage>
-</template>
-
-
 <script setup lang="ts">
 import type { FoodItem } from '~/types'
 
@@ -82,7 +6,9 @@ const CART_KEY = process.env.CART_KEY || 'mamaFoodCart'
 const router = useRouter()
 const cartCookie = useCookie<CartItem[] | null>(CART_KEY)
 const loading = ref(false)
-
+const cartOpen = ref(false)
+const toast = useToast()
+const isAnimating = ref(false)
 interface CartItem extends FoodItem {
     quantity: number
 }
@@ -104,7 +30,14 @@ onMounted(async () => {
 const cartItems = ref<CartItem[]>([])
 
 const addToCart = (item: FoodItem) => {
+    isAnimating.value = true
+    setTimeout(() => isAnimating.value = false, 300)
     const existing = cartItems.value.find((c): c is CartItem => c.id === item.id)
+    toast.add({
+        title: $t('shop.cart.added', { item: item.name }),
+        color: 'success',
+        description: $t('shop.cart.addedDesc', { item: item.name, count: existing ? existing.quantity + 1 : 1 }),
+    })
     if (existing) {
         existing.quantity++
     } else {
@@ -130,7 +63,6 @@ const totalItems = computed(() =>
 )
 
 const totalPrice = computed(() =>
-    // Ensure price is treated as number for calculation
     cartItems.value.reduce((sum, item) => sum + (Number(item.price) || 0) * item.quantity, 0)
 )
 
@@ -139,3 +71,77 @@ const checkout = () => {
     router.push('/checkout')
 }
 </script>
+
+<template>
+    <UPage class="mx-auto max-w-7xl px-4 py-8">
+
+        <!-- Header -->
+        <UContainer color="neutral" variant="soft" class ="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-4xl font-extrabold">{{ $t('shop.title') }}</h1>
+                <p class="text-muted mt-2 font-light">{{ $t('shop.subtitle') }}</p>
+            </div>
+
+            <!-- Floating Cart Icon Button -->
+
+            <USlideover v-model:open="cartOpen" side="right" :title="$t('shop.cart.title')">
+                <!-- Trigger: Cart icon with item count badge -->
+                <UChip :text="totalItems" size="2xl" :show="totalItems > 0" color="warning">
+                    <UButton icon="i-lucide-shopping-cart" color="neutral" variant="soft" size="xl"
+                        class="rounded-xl transition-all duration-300"
+                        :class="{ 'scale-150 ring-2 ring-warning-500': isAnimating }" @click="cartOpen = true" />
+                </UChip>
+
+                <!-- Slideover body -->
+                <template #body>
+                    <!-- Empty Cart -->
+                    <div v-if="cartItems.length === 0"
+                        class="py-12 text-center h-full flex flex-col items-center justify-center">
+                        <p class="text-4xl mb-4 opacity-20">🍱</p>
+                        <p class="text-muted">{{ $t('shop.cart.empty') }}</p>
+                    </div>
+
+                    <!-- Cart Items -->
+                    <div v-else class="space-y-3">
+                        <div v-for="cartItem in cartItems" :key="cartItem.id"
+                            class="flex justify-between items-center bg-elevated p-3 rounded-2xl">
+                            <div class="min-w-0 mr-2">
+                                <p class="font-bold text-sm truncate">{{ cartItem.name }}</p>
+                                <p class="text-xs text-muted">฿{{ cartItem.price }} x {{ cartItem.quantity }}</p>
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <UButton icon="i-lucide-minus" color="neutral" variant="ghost" size="xs"
+                                    @click="removeFromCart(cartItem.id)" />
+                                <span class="font-mono text-sm w-5 text-center">{{ cartItem.quantity }}</span>
+                                <UButton icon="i-lucide-plus" color="warning" variant="ghost" size="xs"
+                                    @click="addToCart(cartItem)" />
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Slideover footer -->
+                <template v-if="cartItems.length > 0" #footer>
+                    <div class="w-full space-y-4">
+                        <div class="flex justify-between text-lg font-bold">
+                            <span class="text-muted">{{ $t('shop.cart.total') }}</span>
+                            <span class="text-warning font-mono text-xl">฿{{ totalPrice }}</span>
+                        </div>
+                        <UButton block color="neutral" size="xl" class="rounded-2xl font-bold" @click="checkout">
+                            {{ $t('shop.cart.checkout') }}
+                        </UButton>
+                    </div>
+                </template>
+            </USlideover>
+        </UContainer>
+
+        <!-- Loading Spinner -->
+        <div v-if="loading" class="flex justify-center items-center h-64">
+            <UIcon name="i-lucide-loader-circle" class="size-12 text-warning animate-spin" />
+        </div>
+
+        <!-- Menu Grid -->
+        <FoodGrid v-else :foods="menuItems" :grid-cols="4" :add-to-cart="addToCart" />
+
+    </UPage>
+</template>
