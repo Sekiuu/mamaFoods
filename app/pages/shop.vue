@@ -71,37 +71,35 @@ const checkout = () => {
     router.push('/checkout')
 }
 </script>
-
 <template>
     <UPage class="mx-auto max-w-7xl px-4 py-8">
 
         <!-- Header -->
-        <UContainer color="neutral" variant="soft" class ="flex items-center justify-between mb-8">
+        <UContainer color="neutral" variant="soft" class="flex items-center justify-between mb-8">
             <div>
                 <h1 class="text-4xl font-extrabold">{{ $t('shop.title') }}</h1>
                 <p class="text-muted mt-2 font-light">{{ $t('shop.subtitle') }}</p>
             </div>
+        </UContainer>
 
-            <!-- Floating Cart Icon Button -->
-
+        <!-- Sticky Cart Button (fixed under navbar) -->
+        <div class="fixed right-6 md:right-1/10 z-50" style="top: calc(var(--ui-header-height) + 1rem)">
             <USlideover v-model:open="cartOpen" side="right" :title="$t('shop.cart.title')">
-                <!-- Trigger: Cart icon with item count badge -->
+
+                <!-- Trigger -->
                 <UChip :text="totalItems" size="2xl" :show="totalItems > 0" color="warning">
                     <UButton icon="i-lucide-shopping-cart" color="neutral" variant="soft" size="xl"
-                        class="rounded-xl transition-all duration-300"
+                        class="rounded-xl shadow-lg transition-all duration-300"
                         :class="{ 'scale-150 ring-2 ring-warning-500': isAnimating }" @click="cartOpen = true" />
                 </UChip>
 
                 <!-- Slideover body -->
                 <template #body>
-                    <!-- Empty Cart -->
                     <div v-if="cartItems.length === 0"
                         class="py-12 text-center h-full flex flex-col items-center justify-center">
                         <p class="text-4xl mb-4 opacity-20">🍱</p>
                         <p class="text-muted">{{ $t('shop.cart.empty') }}</p>
                     </div>
-
-                    <!-- Cart Items -->
                     <div v-else class="space-y-3">
                         <div v-for="cartItem in cartItems" :key="cartItem.id"
                             class="flex justify-between items-center bg-elevated p-3 rounded-2xl">
@@ -132,8 +130,9 @@ const checkout = () => {
                         </UButton>
                     </div>
                 </template>
+
             </USlideover>
-        </UContainer>
+        </div>
 
         <!-- Loading Spinner -->
         <div v-if="loading" class="flex justify-center items-center h-64">
