@@ -54,7 +54,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <AdminHeader title="Order Management" :enable-logout="true" />
+    <AdminHeader title="Order Management" :enable-back="true" />
     <UPage class="min-h-screen max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div class="px-4 py-6 sm:px-0">
             <!-- Notifications -->
