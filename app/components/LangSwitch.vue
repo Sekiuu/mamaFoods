@@ -2,7 +2,7 @@
     <ULocaleSelect 
     v-model="locale" 
     :locales="supportedLocales" 
-    @update:model-value="(e : any) => onLocaleChange(e)" class="w-48" />
+    @update:model-value="onLocaleChange" class="w-48" />
 </template>
 <script setup lang="ts">
 import { th, en } from '@nuxt/ui/locale';

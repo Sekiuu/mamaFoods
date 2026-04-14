@@ -1,8 +1,8 @@
 <template>
-  <UPageCTA :title="$t('wellcome.title') + ' MamaFood'" :subtitle="$t('wellcome.subtitle')" 
+  <UPageCTA :title="$t('welcome.title') + ' MamaFood'" :subtitle="$t('welcome.subtitle')" 
   :links="[
     {
-      label: $t('wellcome.cta.button'),
+      label: $t('welcome.cta.button'),
       color: 'primary',
       variant: 'soft',
       onClick: orderNow,
