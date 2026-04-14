@@ -1,116 +1,9 @@
-<template>
-    <div class="bg-white shadow overflow-hidden sm:rounded-md">
-        <div class="px-4 py-5 sm:p-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Order CRUD Operations</h3>
-
-            <!-- Orders Table -->
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                ID</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Customer</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Phone</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Address</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Total</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Created</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="order in orders" :key="order.id">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ order.id }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ order.customer_name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ order.customer_phone }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ order.customer_address }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ order.total_price }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <select :value="order.status" @change="handleStatusChange(order.id, $event)"
-                                    class="text-sm border-gray-300 rounded-md">
-                                    <option value="pending">Pending</option>
-                                    <option value="confirmed">Confirmed</option>
-                                    <option value="cancelled">Cancelled</option>
-                                    <option value="preparing">Preparing</option>
-                                    <option value="delivering">Delivering</option>
-                                    <option value="delivered">Delivered (Awaiting Confirm)</option>
-                                    <option value="completed">Completed</option>
-                                </select>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatDate(order.create_at)
-                                }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <button @click="handleEdit(order)" class="text-indigo-600 hover:text-indigo-900 mr-2">
-                                    Edit
-                                </button>
-                                <button @click="handleDelete(order.id)" class="text-red-600 hover:text-red-900">
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Edit Modal -->
-            <div v-if="editingOrder" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
-                @click="closeEditModal">
-                <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white" @click.stop>
-                    <div class="mt-3">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">Edit Order #{{ editingOrder.id }}</h3>
-                        <form @submit.prevent="handleSaveEdit">
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700">Customer Name</label>
-                                <input v-model="editingOrder.customer_name" type="text"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" />
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700">Phone</label>
-                                <input v-model="editingOrder.customer_phone" type="text"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" />
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700">Address</label>
-                                <textarea v-model="editingOrder.customer_address"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700">Note</label>
-                                <textarea v-model="editingOrder.customer_note"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
-                            </div>
-                            <div class="flex justify-end space-x-2">
-                                <button type="button" @click="closeEditModal"
-                                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">
-                                    Cancel
-                                </button>
-                                <button type="submit"
-                                    class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700">
-                                    Save
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
-
 <script setup lang="ts">
-import type { Order } from '~/types/orders'
+import { h, resolveComponent } from 'vue'
+import type { TableColumn } from '@nuxt/ui'
+import { OrderStatus, PaymentStatus, type Order } from '~/types/orders'
 import { useOrderManagement } from '~/composables/useOrderManagement'
+
 interface Props {
     orders: Order[]
     onStatusUpdate: (id: number, status: string) => void
@@ -119,45 +12,245 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-
-const editingOrder = ref<Order | null>(null)
-
 const { formatDate } = useOrderManagement()
+const toast = useToast()
+const { t } = useI18n()
 
-const handleStatusChange = (id: number, event: Event) => {
-    const target = event.target as HTMLSelectElement
-    props.onStatusUpdate(id, target.value)
-}
+// ── Edit modal ────────────────────────────────────────────────
+const editOpen = ref(false)
+const editingOrder = ref<Order | null>(null)
+const isSaving = ref(false)
+const isDeleting = ref<number | null>(null)
 
 const handleEdit = (order: Order) => {
     editingOrder.value = { ...order }
+    editOpen.value = true
     props.onEdit(order)
 }
 
-const handleDelete = async (id: number) => {
-    const success = await props.onDelete(id)
-    if (success) {
-        // Handle success
-    }
+const closeEditModal = () => {
+    editOpen.value = false
+    editingOrder.value = null
 }
 
 const handleSaveEdit = async () => {
     if (!editingOrder.value) return
-
+    isSaving.value = true
     try {
-        await props.onStatusUpdate(editingOrder.value.id, editingOrder.value.status || 'pending')
-        // Additional update logic can be added here
-        editingOrder.value = null
+        await props.onStatusUpdate(editingOrder.value.id, editingOrder.value.status ?? OrderStatus.Pending)
+        toast.add({ title: t('admin.toasts.orderUpdated'), color: 'success', icon: 'i-lucide-check-circle' })
+        closeEditModal()
     } catch (error) {
         console.error('Failed to save order:', error)
+        toast.add({ title: t('admin.toasts.orderUpdateFailed'), color: 'error', icon: 'i-lucide-x-circle' })
+    } finally {
+        isSaving.value = false
     }
 }
 
-const closeEditModal = () => {
-    editingOrder.value = null
+const handleDelete = async (id: number) => {
+    isDeleting.value = id
+    try {
+        await props.onDelete(id)
+        toast.add({ title: t('admin.toasts.orderDeleted', { id }), color: 'success', icon: 'i-lucide-trash' })
+    } finally {
+        isDeleting.value = null
+    }
 }
 
-defineExpose({
-    editingOrder
-})
+// ── Status options ────────────────────────────────────────────
+const orderStatusOptions = [
+    { label: t('order.status.pending'), value: OrderStatus.Pending, icon: 'i-lucide-clock' },
+    { label: t('order.status.confirmed'), value: OrderStatus.Confirmed, icon: 'i-lucide-check' },
+    { label: t('order.status.preparing'), value: OrderStatus.Preparing, icon: 'i-lucide-chef-hat' },
+    { label: t('order.status.delivering'), value: OrderStatus.Delivering, icon: 'i-lucide-bike' },
+    { label: t('order.status.delivered'), value: OrderStatus.Delivered, icon: 'i-lucide-package-check' },
+    { label: t('order.status.completed'), value: OrderStatus.Completed, icon: 'i-lucide-check-circle' },
+    { label: t('order.status.cancelled'), value: OrderStatus.Cancelled, icon: 'i-lucide-x-circle' },
+]
+
+const paymentStatusOptions = [
+    { label: t('payment.paid'), value: PaymentStatus.Paid, icon: 'i-lucide-circle-dollar-sign' },
+    { label: t('payment.unpaid'), value: PaymentStatus.Unpaid, icon: 'i-lucide-ban' },
+]
+
+const statusConfig: Record<string, { color: 'warning' | 'info' | 'success' | 'error' | 'neutral', icon: string }> = {
+    [OrderStatus.Pending]: { color: 'warning', icon: 'i-lucide-clock' },
+    [OrderStatus.Confirmed]: { color: 'info', icon: 'i-lucide-check' },
+    [OrderStatus.Preparing]: { color: 'info', icon: 'i-lucide-chef-hat' },
+    [OrderStatus.Delivering]: { color: 'info', icon: 'i-lucide-bike' },
+    [OrderStatus.Delivered]: { color: 'success', icon: 'i-lucide-package-check' },
+    [OrderStatus.Completed]: { color: 'success', icon: 'i-lucide-check-circle' },
+    [OrderStatus.Cancelled]: { color: 'error', icon: 'i-lucide-x-circle' },
+}
+
+const paymentConfig: Record<string, { color: 'success' | 'neutral', icon: string }> = {
+    [PaymentStatus.Paid]: { color: 'success', icon: 'i-lucide-circle-dollar-sign' },
+    [PaymentStatus.Unpaid]: { color: 'neutral', icon: 'i-lucide-ban' },
+}
+
+// ── Table columns ─────────────────────────────────────────────
+const UBadge = resolveComponent('UBadge')
+const USelectMenu = resolveComponent('USelectMenu')
+const UButton = resolveComponent('UButton')
+
+const columns: TableColumn<Order>[] = [
+    {
+        accessorKey: 'id',
+        header: t('admin.table.id'),
+        cell: ({ row }) => h('span', { class: 'font-semibold' }, `#${row.original.id}`),
+    },
+    {
+        accessorKey: 'customer_name',
+        header: t('admin.table.customer'),
+    },
+    {
+        accessorKey: 'customer_phone',
+        header: t('admin.table.phone'),
+    },
+    {
+        accessorKey: 'customer_address',
+        header: t('admin.table.address'),
+        cell: ({ row }) =>
+            h('span', { class: 'max-w-[160px] truncate block', title: row.original.customer_address ?? '' },
+                row.original.customer_address?? '',
+            ),
+    },
+    {
+        accessorKey: 'total_price',
+        header: t('admin.table.total'),
+        cell: ({ row }) => h('span', { class: 'font-semibold' }, `฿${row.original.total_price}`),
+    },
+    {
+        accessorKey: 'status',
+        header: t('admin.table.status'),
+        cell: ({ row }) =>
+            h(USelectMenu, {
+                modelValue: row.original.status,
+                items: orderStatusOptions,
+                valueKey: 'value',
+                class: 'w-44',
+                'onUpdate:modelValue': (val: string) => props.onStatusUpdate(row.original.id, val),
+            }, {
+                'leading': () => h(UBadge, {
+                    color: statusConfig[row.original.status]?.color ?? 'neutral',
+                    variant: 'subtle',
+                    size: 'sm',
+                    icon: statusConfig[row.original.status]?.icon,
+                    class: 'mr-1',
+                }),
+            }),
+    },
+    {
+        accessorKey: 'payment_status',
+        header: t('admin.table.payment'),
+        cell: ({ row }) =>
+            h(USelectMenu, {
+                modelValue: row.original.payment_status,
+                items: paymentStatusOptions,
+                valueKey: 'value',
+                class: 'w-32',
+                'onUpdate:modelValue': (val: string) => props.onStatusUpdate(row.original.id, val),
+            }, {
+                'leading': () => h(UBadge, {
+                    color: paymentConfig[row.original.payment_status]?.color ?? 'neutral',
+                    variant: 'subtle',
+                    size: 'sm',
+                    icon: paymentConfig[row.original.payment_status]?.icon,
+                    class: 'mr-1',
+                }),
+            }),
+    },
+    {
+        accessorKey: 'create_at',
+        header: t('admin.table.created'),
+        cell: ({ row }) => h('span', { class: 'text-muted text-sm' }, formatDate(row.original.create_at)),
+    },
+    {
+        id: 'actions',
+        header: t('admin.table.actions'),
+        cell: ({ row }) =>
+            h('div', { class: 'flex items-center gap-2' }, [
+                h(UButton, {
+                    icon: 'i-lucide-pencil',
+                    size: 'sm',
+                    color: 'info',
+                    variant: 'ghost',
+                    onClick: () => handleEdit(row.original),
+                }),
+                h(UButton, {
+                    icon: 'i-lucide-trash',
+                    size: 'sm',
+                    color: 'error',
+                    variant: 'ghost',
+                    loading: isDeleting.value === row.original.id,
+                    onClick: () => handleDelete(row.original.id),
+                }),
+            ]),
+    },
+]
+
+defineExpose({ editingOrder })
 </script>
+
+<template>
+    <UCard>
+        <template #header>
+            <p class="text-lg font-semibold">{{ $t('admin.crud.orderTitle') }}</p>
+        </template>
+
+        <!-- Table -->
+        <UTable :data="orders" :columns="columns" sticky class="max-h-screen" />
+
+        <!-- Edit Modal -->
+        <UModal v-model:open="editOpen" :title="$t('admin.crud.editOrder', { id: editingOrder?.id })"
+            :description="$t('admin.crud.editOrderDesc')" @update:open="val => !val && closeEditModal()">
+            <template #body>
+                <div v-if="editingOrder" class="space-y-4">
+                    <UFormField :label="$t('customerInfo.name')" name="customer_name">
+                        <UInput v-model="editingOrder.customer_name" :placeholder="$t('customerInfo.name')"
+                            leading-icon="i-lucide-user" class="w-full" />
+                    </UFormField>
+
+                    <UFormField :label="$t('customerInfo.phone')" name="customer_phone">
+                        <UInput v-model="editingOrder.customer_phone" :placeholder="$t('customerInfo.phone')"
+                            leading-icon="i-lucide-phone" class="w-full" />
+                    </UFormField>
+
+                    <UFormField :label="$t('customerInfo.address')" name="customer_address">
+                        <UTextarea v-model="editingOrder.customer_address" :placeholder="$t('customerInfo.address')" :rows="3"
+                            class="w-full" />
+                    </UFormField>
+
+                    <UFormField :label="$t('customerInfo.note')" name="customer_note">
+                        <UTextarea v-model="editingOrder.customer_note" :placeholder="$t('customerInfo.note')" :rows="2"
+                            class="w-full" />
+                    </UFormField>
+
+                    <USeparator />
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <UFormField :label="$t('admin.table.status')" name="status">
+                            <USelectMenu v-model="editingOrder.status" :items="orderStatusOptions" value-key="value"
+                                leading-icon="i-lucide-package" class="w-full" />
+                        </UFormField>
+
+                        <UFormField :label="$t('admin.table.payment')" name="payment_status">
+                            <USelectMenu v-model="editingOrder.payment_status" :items="paymentStatusOptions"
+                                value-key="value" leading-icon="i-lucide-credit-card" class="w-full" />
+                        </UFormField>
+                    </div>
+                </div>
+            </template>
+
+            <template #footer>
+                <div class="flex justify-end gap-2 w-full">
+                    <UButton :label="$t('btn.cancel')" color="neutral" variant="outline" icon="i-lucide-x"
+                        @click="closeEditModal" />
+                    <UButton :label="$t('btn.save')" color="primary" icon="i-lucide-save" :loading="isSaving"
+                        @click="handleSaveEdit" />
+                </div>
+            </template>
+        </UModal>
+    </UCard>
+</template>

@@ -5,19 +5,49 @@ import OrderManager from '~/components/admin/OrderManager.vue'
 import OrderCrud from '~/components/admin/OrderCrud.vue'
 import type { Order } from '~/types'
 import type { TabsItem } from '@nuxt/ui'
+import { OrderStatus, PaymentStatus } from '~/types/orders'
+import type { SelectMenuItem } from '@nuxt/ui'
+const { t } = useI18n()
+
 const activeTab = ref('manager')
 enum TabsRepresents {
     manager = 'manager',
     crud = 'crud'
 }
+const globalFilter = ref('')
+const filterStatus = ref<Array<OrderStatus | PaymentStatus>>([])
+const activeOrders = computed(() => {
+    if (!orders.value) return []
+    if (filterStatus.value.length === 0) return orders.value
+    return orders.value.filter(o =>
+        (filterStatus.value.includes(o.status) || filterStatus.value.includes(o.payment_status)) &&
+        o.customer_name.toLowerCase().includes(globalFilter.value.toLowerCase()))
+}
+)
+
+const filterOptions: Array<SelectMenuItem> = [
+    { label: t('order.status.title'), type: 'label' },
+    { label: t('order.status.pending'), value: OrderStatus.Pending, icon: 'i-lucide-clock' },
+    { label: t('order.status.confirmed'), value: OrderStatus.Confirmed, icon: 'i-lucide-check' },
+    { label: t('order.status.preparing'), value: OrderStatus.Preparing, icon: 'i-lucide-chef-hat' },
+    { label: t('order.status.delivering'), value: OrderStatus.Delivering, icon: 'i-lucide-bike' },
+    { label: t('order.status.delivered'), value: OrderStatus.Delivered, icon: 'i-lucide-package-check' },
+    { label: t('order.status.completed'), value: OrderStatus.Completed, icon: 'i-lucide-check-circle' },
+    { label: t('order.status.cancelled'), value: OrderStatus.Cancelled, icon: 'i-lucide-x-circle' },
+    { type: 'separator' },
+    { label: t('payment.status'), type: 'label' },
+    { label: t('payment.paid'), value: PaymentStatus.Paid, icon: 'i-lucide-circle-dollar-sign' },
+    { label: t('payment.unpaid'), value: PaymentStatus.Unpaid, icon: 'i-lucide-ban' },
+]
+
 const tabs: TabsItem[] = [
     {
-        label: 'managers',
+        label: t('tabs.manager'),
         value: 'manager',
         icon: 'i-lucide-list'
     },
     {
-        label: 'CRUD Operations',
+        label: t('tabs.crud'),
         value: 'crud',
         icon: 'i-lucide-list'
     }
@@ -54,24 +84,43 @@ onMounted(async () => {
 </script>
 
 <template>
-    <AdminHeader title="Order Management" :enable-back="true" />
-    <UPage class="min-h-screen max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="px-4 py-6 sm:px-0">
-            <!-- Notifications -->
+    <AdminHeader :title="$t('admin.header.order')" :enable-back="true" />
+    <UCard class="min-h-screen max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+
+        <!-- Notifications -->
+        <template #header>
             <UAlert v-if="newOrdersCount > 0" variant="soft"
-                :title="`You have ${ newOrdersCount } new pending order${ newOrdersCount > 1 ? 's' : '' }!`" />
+                :title="$t('admin.crud.newOrders', { count: newOrdersCount })" />
 
             <!-- Tabs -->
             <UTabs class="mb-6" v-model="activeTab" :items="tabs" color="neutral" variant="pill" />
+            <!-- Search and filter -->
+            <div class="space-x-6">
+                <UInput v-model="globalFilter" color="info" variant="soft" icon="i-lucide-search"
+                    :placeholder="$t('admin.crud.search')" class="w-64 my-auto" />
+                <!-- Filter combobox dropdown with checkboxes -->
+                <USelectMenu v-model="filterStatus" :items="filterOptions" value-key="value" multiple
+                    :placeholder="$t('order.status.title')" leading-icon="i-lucide-filter" :clear="filterStatus.length > 0"
+                    class="w-full sm:w-56">
+                    <!-- Trigger label: show count badge when filters active -->
+                    <template #default>
+                        <span v-if="filterStatus.length === 0" class="text-muted">{{ $t('admin.crud.search') }}</span>
+                        <span v-else class="flex items-center gap-1.5">
+                            {{ $t('admin.table.status') }}
+                            <UBadge :label="String(filterStatus.length)" color="primary" variant="solid" />
+                        </span>
+                    </template>
+                </USelectMenu>
+            </div>
+        </template>
+        <!-- Order Manager Tab -->
+        <OrderManager v-if="activeTab === TabsRepresents.manager" :orders="activeOrders as Order[]"
+            :on-status-update="handleStatusUpdate" />
 
-            <!-- Order Manager Tab -->
-            <OrderManager v-if="activeTab === TabsRepresents.manager" :orders="orders as Order[]"
-                :on-status-update="handleStatusUpdate" />
 
+        <!-- CRUD Operations Tab -->
+        <OrderCrud v-if="activeTab === TabsRepresents.crud" :orders="activeOrders as Order[]"
+            :on-status-update="handleStatusUpdate" :on-edit="handleEdit" :on-delete="handleDelete" />
 
-            <!-- CRUD Operations Tab -->
-            <OrderCrud v-if="activeTab === TabsRepresents.crud" :orders="orders as Order[]"
-                :on-status-update="handleStatusUpdate" :on-edit="handleEdit" :on-delete="handleDelete" />
-        </div>
-    </UPage>
+    </UCard>
 </template>

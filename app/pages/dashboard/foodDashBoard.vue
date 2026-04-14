@@ -1,5 +1,5 @@
 <template>
-    <AdminHeader title="Food Dashboard" :enable-back="true" />
+    <AdminHeader :title="$t('admin.header.food')" :enable-back="true" />
 
     <UPage>
         <div class="container mx-auto px-4 py-8">
@@ -14,18 +14,18 @@
                     <!-- Header -->
                     <UPageHeader class="mb-4 gap-4" >
                         <!-- View Mode Options -->
-                        <USelect v-model="viewMode" placeholder="View Mode" :items="[
-                            { label: 'Table', value: 'table' },
-                            { label: 'Grid', value: 'grid' },
+                        <USelect v-model="viewMode" :placeholder="$t('shop.viewMode.label')" :items="[
+                            { label: $t('shop.viewMode.table'), value: 'table' },
+                            { label: $t('shop.viewMode.grid'), value: 'grid' },
                             ]"
                             @change="handleViewModeChange" 
                             class="w-fit mx-2"/>
                         <!-- grid options -->
                         <USelect v-if="viewMode === 'grid'" v-model.number="gridCols" title="Grid Collums"
                             placeholder="Grid Collums" :items="[
-                                { label: '2 collums', value: 2 },
-                                { label: '3 collums', value: 3 }, 
-                                { label: '4 collums', value: 4 }]"
+                                { label: `2 ${$t('admin.crud.search')}`, value: 2 },
+                                { label: `3 ${$t('admin.crud.search')}`, value: 3 }, 
+                                { label: `4 ${$t('admin.crud.search')}`, value: 4 }]"
                             @change="(e: any) => gridCols = parseInt(e.target.value) || 3"
                             class="w-fit mx-2" />
                     </UPageHeader>

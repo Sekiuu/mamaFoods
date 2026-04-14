@@ -25,11 +25,189 @@
     },
     "shop": {
         "title": "Our Menu",
-        "subtitle": "Select your favorite dishes and order now.",
-        "empty": "No items found."
+        "subtitle": "Select from your favorites and order now.",
+        "empty": "No items found",
+        "viewMode": {
+            "label": "View Mode",
+            "table": "Table",
+            "grid": "Grid"
+        },
+        "cart": {
+            "title": "Shopping Cart",
+            "empty": "Your cart is empty",
+            "total": "Total",
+            "checkout": "Checkout",
+            "items": "Items",
+            "added": "Added {item} to cart",
+            "addedDesc": "You have {count} items of {item} in your cart!"
+        },
+        "management": {
+            "food": "Food Management",
+            "foodDesc": "Manage menu items and prices",
+            "order": "Order Management",
+            "orderDesc": "Manage customer orders",
+            "user": "User Management",
+            "userDesc": "Manage users and permissions",
+            "stats": "Statistics",
+            "statsDesc": "View analytics and reports"
+        }
     },
-    "nav":{
-        "menu": "Menu",
+    "nav": {
+        "menu": "Order Food",
         "myOrders": "My Orders"
+    },
+    "payment": {
+        "title": "Payment",
+        "status": "Payment Status",
+        "method": "Payment Method",
+        "paid": "Paid",
+        "unpaid": "Unpaid",
+        "pay": "Pay Now",
+        "desc": "Check payment details and scan QR code to complete payment",
+        "qrCode": {
+            "title": "Pay via QR Code",
+            "desc": "Scan QR code to pay",
+            "loading": "Generating QR Code..."
+        }
+    },
+    "checkout": {
+        "confirmOrder": "Confirm Order",
+        "cancelOrder": "Cancel Order",
+        "processing": "Processing...",
+        "subtitle": "Please review your order",
+        "orderSummary": {
+            "title": "Order Summary",
+            "total": "Total",
+            "totalItems": "Total Items"
+        }
+    },
+    "customerInfo": {
+        "title": "Customer Info",
+        "name": "Name",
+        "phone": "Phone",
+        "address": "Address",
+        "note": "Note",
+        "placeholders": {
+            "name": "Enter your full name",
+            "phone": "Enter your phone number",
+            "address": "Enter your delivery address",
+            "note": "Any special requests or instructions..."
+        },
+        "validation": {
+            "name": "Name must not contain numbers and max 32 chars",
+            "phone": "Phone must be 10 digits (e.g., 0812345678)",
+            "address": "Please enter a clear address (at least 6 chars)",
+            "requiredFields": "Please fill in all required fields."
+        }
+    },
+    "myOrders": {
+        "title": "My Orders",
+        "subtitle": "Review your recent purchases and payment details",
+        "tabs": {
+            "all": "All",
+            "pending": "Pending",
+            "completed": "Completed",
+            "cancelled": "Cancelled",
+            "unpaid": "Unpaid"
+        }
+    },
+    "orderList": {
+        "empty": "No orders found",
+        "viewDetails": "View Details"
+    },
+    "orderCard": {
+        "orderId": "Order ID",
+        "orderSummary": "Order Summary",
+        "orderDate": "Order Date",
+        "cancelOrder": "Cancel Order",
+        "completed": "Order Completed",
+        "ratingAndReview": "Rate and Review",
+        "ratingAndReviewDesc": "How was the food? Rate us here!",
+        "reportProblem": "Report Problem",
+        "confirmReceipt": "Confirm Receipt",
+        "completeOrderThankyou": "Thank you for your order",
+        "confirmReceiptDesc": "Have you received all items? If yes, please confirm receipt."
+    },
+    "order": {
+        "title": "Order",
+        "status": {
+            "title": "Order Status",
+            "pending": "Pending",
+            "confirmed": "Confirmed",
+            "preparing": "Preparing",
+            "delivering": "Delivering",
+            "delivered": "Delivered",
+            "completed": "Completed",
+            "cancelled": "Cancelled"
+        }
+    },
+    "orderManager": {
+        "title": "Order Management",
+        "forceCompleteConfirmation": "Are you sure you want to manually change status to \"Completed\"? This cannot be undone.",
+        "forceComplete": "Force Complete",
+        "changingStatus": "Updating status"
+    },
+    "admin": {
+        "header": {
+            "dashboard": "Dashboard",
+            "order": "Order Management",
+            "food": "Food Management",
+            "user": "User Management",
+            "back": "Back to Dashboard",
+            "logout": "Logout"
+        },
+        "login": {
+            "title": "Login",
+            "username": "Username",
+            "password": "Password",
+            "submit": "Sign in"
+        },
+        "crud": {
+            "orderTitle": "Order CRUD Operations",
+            "userTitle": "Users",
+            "foodTitle": "Food Management",
+            "search": "Search...",
+            "editOrder": "Edit Order #{id}",
+            "editOrderDesc": "Update the customer details for this order.",
+            "newOrders": "You have {count} new pending orders!"
+        },
+        "toasts": {
+            "orderUpdated": "Order updated successfully",
+            "orderUpdateFailed": "Failed to update order",
+            "orderDeleted": "Order #{id} deleted"
+        },
+        "table": {
+            "id": "ID",
+            "customer": "Customer",
+            "phone": "Phone",
+            "address": "Address",
+            "total": "Total",
+            "status": "Order Status",
+            "payment": "Payment",
+            "created": "Created",
+            "actions": "Actions",
+            "name": "Name",
+            "role": "Role"
+        }
+    },
+    "tabs": {
+        "manager": "Manager",
+        "crud": "CRUD Operations"
+    },
+    "orderActions": {
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "startPreparing": "Start Preparing",
+        "startDelivery": "Start Delivery",
+        "markDelivered": "Mark Delivered",
+        "markPaid": "Mark Paid"
+    },
+    "alert": {
+        "do-not": "No",
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "ok": "OK",
+        "error": "Error",
+        "permission-denied": "Permission Denied"
     }
 }

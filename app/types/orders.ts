@@ -9,15 +9,15 @@ export interface CustomerInfo {
 
 export interface Order {
     id: number
-    customer_name: string | null
-    customer_phone: string | null
-    customer_address: string | null
-    customer_note: string | null
-    items: string | null
-    total_price: string | null
+    customer_name: string | ''
+    customer_phone: string | ''
+    customer_address: string | ''
+    customer_note: string | ''
+    items: string
+    total_price: string
     payment_status: PaymentStatus
     status: OrderStatus
-    create_at: Date | string | null
+    create_at: Date | string
 }
 export enum OrderStatus {
     Pending = "pending",

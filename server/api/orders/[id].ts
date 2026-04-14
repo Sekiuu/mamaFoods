@@ -27,9 +27,9 @@ export default defineEventHandler(async (event) => {
 
   if (event.req.method === 'PUT') {
     const body = await readBody(event)
-    const { status } = body
-    console.log(status)
-    if (!status) {
+    const { status, payment_status } = body
+    // console.log(status + ' ' + payment_status)
+    if (!status && !payment_status) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Missing required status field',

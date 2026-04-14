@@ -27,10 +27,10 @@ const handleLogout = async () => {
     <template #right>
       <slot name="actions" />
       <UButton v-if="enableBack" to="/dashboard" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md mr-4">
-        Back to Dashboard
+        {{ $t('admin.header.back') }}
       </UButton>
       <UButton v-if="enableLogout" color="error" icon="i-lucide-log-out" :loading="processing" @click="handleLogout">
-        Logout
+        {{ $t('admin.header.logout') }}
       </UButton>
     </template>
   </UHeader>

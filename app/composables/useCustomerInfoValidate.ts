@@ -2,6 +2,7 @@ import { computed, type Ref } from 'vue'
 import type { CustomerInfo } from "~/types"
 
 export const useCustomerInfoValidate = (customerInfo: Ref<CustomerInfo>) => {
+  const { t } = useI18n()
   
   // 1. ตรวจสอบชื่อ: ต้องไม่ว่าง, ไม่เกิน 32 ตัวอักษร และ "ห้ามมีตัวเลข"
   const isNameValid = computed(() => {
@@ -34,9 +35,9 @@ export const useCustomerInfoValidate = (customerInfo: Ref<CustomerInfo>) => {
 
   const errors = computed(() => {
     return {
-      name: isNameValid.value ? '' : 'ชื่อต้องไม่มีตัวเลข และยาวไม่เกิน 32 ตัวอักษร',
-      phone: isPhoneValid.value ? '' : 'เบอร์โทรต้องเป็นตัวเลข 10 หลัก (เช่น 0812345678)',
-      address: isAddressValid.value ? '' : 'กรุณากรอกที่อยู่ให้ชัดเจน (อย่างน้อย 6 ตัวอักษร)',
+      name: isNameValid.value ? '' : t('customerInfo.validation.name'),
+      phone: isPhoneValid.value ? '' : t('customerInfo.validation.phone'),
+      address: isAddressValid.value ? '' : t('customerInfo.validation.address'),
     }
   })
 

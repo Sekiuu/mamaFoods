@@ -2,33 +2,33 @@
   <UCard>
     <template #header>
       <h2 class="text-2xl font-bold">
-        {{ isEditing ? 'Edit Food Item' : 'Add New Food Item' }}
+        {{ isEditing ? $t('admin.food.edit') : $t('admin.food.create') }}
       </h2>
     </template>
 
     <UForm :schema="schema" :state="formData" class="space-y-4" @submit="submitForm">
-      <UFormField label="Food Name" name="name" required>
-        <UInput v-model="formData.name" placeholder="Enter food name" class="w-full" />
+      <UFormField :label="$t('admin.food.name')" name="name" required>
+        <UInput v-model="formData.name" :placeholder="$t('admin.food.name')" class="w-full" />
       </UFormField>
 
-      <UFormField label="Price" name="price" required>
-        <UInput v-model="formData.price" placeholder="Enter price" class="w-full" />
+      <UFormField :label="$t('food.price')" name="price" required>
+        <UInput v-model="formData.price" :placeholder="$t('food.price')" class="w-full" />
       </UFormField>
 
-      <UFormField label="Description" name="description">
-        <UTextarea v-model="formData.description" placeholder="Enter food description" :rows="4" class="w-full" />
+      <UFormField :label="$t('admin.food.description')" name="description">
+        <UTextarea v-model="formData.description" :placeholder="$t('admin.food.description')" :rows="4" class="w-full" />
       </UFormField>
 
-      <UFormField label="Icon URL" name="icon">
-        <UInput v-model="formData.icon" placeholder="Enter icon URL" class="w-full" />
+      <UFormField :label="$t('admin.food.icon')" name="icon">
+        <UInput v-model="formData.icon" :placeholder="$t('admin.food.icon')" class="w-full" />
       </UFormField>
 
       <div class="flex gap-4 pt-4">
         <UButton type="submit" color="success" :loading="isLoading">
-          {{ isEditing ? 'Update' : 'Create' }}
+          {{ isEditing ? $t('admin.food.updateBtn') : $t('admin.food.createBtn') }}
         </UButton>
         <UButton type="button" color="neutral" variant="soft" @click="resetForm">
-          Clear
+          {{ $t('admin.food.clearBtn') }}
         </UButton>
       </div>
     </UForm>
@@ -131,14 +131,14 @@ const submitForm = async () => {
         method: 'PUT',
         body: formData.value,
       })
-      successMessage.value = 'Food item updated successfully!'
+      successMessage.value = t('admin.food.successUpdate')
       emit('food-updated')
     } else {
       await $fetch('/api/foods', {
         method: 'POST',
         body: formData.value,
       })
-      successMessage.value = 'Food item created successfully!'
+      successMessage.value = t('admin.food.successCreate')
       emit('food-created')
     }
 

@@ -2,8 +2,8 @@
   <UCard>
     <template #header>
       <UContainer class="flex justify-between">
-        <h1 class="text-3xl"> Users</h1>
-        <UInput v-model="globalFilter" color="info" variant="soft" icon="i-lucide-search" placeholder="Search users..."
+        <h1 class="text-3xl"> {{ $t('admin.crud.userTitle') }}</h1>
+        <UInput v-model="globalFilter" color="info" variant="soft" icon="i-lucide-search" :placeholder="$t('admin.crud.search')"
           class="w-64 my-auto" />
       </UContainer>
     </template>
@@ -18,10 +18,10 @@
       <template #actions-cell="{ row: thisRow }">
         <div class="flex items-center gap-2">
           <UButton size="sm" color="info" @click="$emit('edit', thisRow.original)">
-            Edit
+            {{ $t('btn.edit') }}
           </UButton>
           <UButton size="sm" color="error" @click="$emit('delete', thisRow.original.id)">
-            Delete
+            {{ $t('btn.delete') }}
           </UButton>
         </div>
       </template>
@@ -42,16 +42,17 @@ defineEmits<{
   delete: [id: number]
 }>()
 
+const { t } = useI18n()
 const globalFilter = ref('')
 
 const columns: TableColumn<UserItem>[] = [
-  { accessorKey: 'id', header: 'ID' },
-  { accessorKey: 'name', header: 'Name' },
-  { accessorKey: 'role', header: 'Role' },
-  { accessorKey: 'create_at', header: 'Created' },
+  { accessorKey: 'id', header: t('admin.table.id') },
+  { accessorKey: 'name', header: t('admin.table.name') },
+  { accessorKey: 'role', header: t('admin.table.role') },
+  { accessorKey: 'create_at', header: t('admin.table.created') },
   {
     id: 'actions',
-    header: 'Actions',
+    header: t('admin.table.actions'),
     meta: { class: { th: 'text-center', td: 'text-center' } }
   }
 ]

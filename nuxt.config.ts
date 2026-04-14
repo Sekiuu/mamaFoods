@@ -11,7 +11,13 @@ export default defineNuxtConfig({
       { code: 'th', file: 'th.json', name: 'Thai' }
     ],
     defaultLocale: 'th',
-    langDir: 'locales/'
+    langDir: 'locales/',
+    detectBrowserLanguage:{
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      redirectOn: 'root',
+      alwaysRedirect: true
+    }
   },
   runtimeConfig: {
     auth: {

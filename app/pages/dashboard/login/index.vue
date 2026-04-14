@@ -2,21 +2,22 @@
 const loading = ref(false)
 const error = ref('')
 
+const { t } = useI18n()
 const { signin: signIn } = useUserAuth()
 
 const fields = [
   {
     name: 'name',
     type: 'text',
-    label: 'Username',
-    placeholder: 'Username',
+    label: t('admin.login.username'),
+    placeholder: t('admin.login.username'),
     required: true
   },
   {
     name: 'password',
     type: 'password',
-    label: 'Password',
-    placeholder: 'Password',
+    label: t('admin.login.password'),
+    placeholder: t('admin.login.password'),
     required: true
   }
 ]
@@ -39,10 +40,10 @@ const login = async ({ data }) => {
 <template>
   <div class="flex flex-col items-center justify-center gap-4 p-12">
     <UAuthForm
-      title="Login"
+      :title="$t('admin.login.title')"
       icon="i-lucide-lock"
       :fields="fields"
-      :submit="{ label: 'Sign in', block: true }"
+      :submit="{ label: $t('admin.login.submit'), block: true }"
       :loading="loading"
       class="max-w-md w-full"
       @submit="login"

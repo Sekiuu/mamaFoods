@@ -26,19 +26,19 @@ const activeOrders = computed(() => props.orders.filter( o =>
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <!-- Order ID -->
                 <div>
-                    <p class="text-sm text-muted">Order ID</p>
+                    <p class="text-sm text-muted">{{ $t('orderCard.orderId') }}</p>
                     <p class="text-xl font-semibold">#{{ order.id }}</p>
                 </div>
 
                 <!-- Total -->
                 <div class="sm:text-right">
-                    <p class="text-sm text-muted">Total</p>
+                    <p class="text-sm text-muted">{{ $t('shop.cart.total') }}</p>
                     <p class="text-lg font-bold text-primary">฿{{ order.total_price }}</p>
                 </div>
 
                 <!-- Status Badge -->
                 <div class="sm:text-right">
-                    <p class="text-sm text-muted mb-1">Status</p>
+                    <p class="text-sm text-muted mb-1">{{ $t('order.status.title') }}</p>
                     <OrderStatusTag :status="order.status" />
                 </div>
             </div>

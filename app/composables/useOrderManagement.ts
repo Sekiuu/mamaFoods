@@ -1,4 +1,4 @@
-import type { Order } from '~/types/orders'
+import { PaymentStatus, type Order } from '~/types/orders'
 
 export const useOrderManagement = () => {
     const orders = ref<Order[]>([])
@@ -20,9 +20,10 @@ export const useOrderManagement = () => {
 
     const updateOrderStatus = async (id: number, status: string) => {
         try {
+            const payload = status === PaymentStatus.Paid ? { payment_status: status } : {  status: status }
             await $fetch(`/api/orders/${id}`, {
                 method: 'PUT',
-                body: { status }
+                body: payload
             })
             await fetchOrders()
         } catch (error) {

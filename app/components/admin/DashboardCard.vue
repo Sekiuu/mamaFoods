@@ -2,7 +2,7 @@
   <div class="bg-white overflow-hidden shadow rounded-lg">
     <div class="p-5">
       <div class="flex items-center">
-        <div class="flex-shrink-0">
+        <div class="flex shrink-0">
           <slot name="icon">
             <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
@@ -20,7 +20,7 @@
         <div class="-ml-2 -mt-2 flex flex-wrap items-bottom">
           <slot name="actions">
             <button class="ml-2 mt-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-md text-sm font-medium">
-              View
+              {{ $t('btn.view') }}
             </button>
           </slot>
         </div>
