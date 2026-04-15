@@ -20,7 +20,8 @@ export const useOrderManagement = () => {
 
     const updateOrderStatus = async (id: number, status: string) => {
         try {
-            const payload = status === PaymentStatus.Paid ? { payment_status: status } : {  status: status }
+            const payload = Array<string>(PaymentStatus.Paid, PaymentStatus.Unpaid).includes(status) ? 
+            { payment_status: status } : {  status: status }
             await $fetch(`/api/orders/${id}`, {
                 method: 'PUT',
                 body: payload

@@ -171,6 +171,18 @@
             "editOrderDesc": "Update the customer details for this order.",
             "newOrders": "You have {count} new pending orders!"
         },
+        "food": {
+            "edit": "Edit Food Item",
+            "create": "Create New Food Item",
+            "name": "Food Name",
+            "description": "Description",
+            "icon": "Icon URL",
+            "updateBtn": "Update",
+            "createBtn": "Create",
+            "clearBtn": "Clear",
+            "successUpdate": "Food item updated successfully!",
+            "successCreate": "Food item created successfully!"
+        },
         "toasts": {
             "orderUpdated": "Order updated successfully",
             "orderUpdateFailed": "Failed to update order",
@@ -190,9 +202,23 @@
             "role": "Role"
         }
     },
+    "btn": {
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "delete": "Delete",
+        "save": "Save Changes",
+        "view": "View Details"
+    },
     "tabs": {
         "manager": "Manager",
         "crud": "CRUD Operations"
+    },
+    "food": {
+        "addToCart": "Add to Cart",
+        "price": "Price",
+        "items": "Food Items",
+        "loading": "Loading..."
     },
     "orderActions": {
         "confirm": "Confirm",
