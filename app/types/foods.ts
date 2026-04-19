@@ -15,5 +15,6 @@ export interface FoodItem {
   price?: string | null
   description?: string | null
   icon?: string | null
+  show?: boolean
   last_edit?: Date | null
 }

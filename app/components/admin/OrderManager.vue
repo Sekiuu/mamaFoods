@@ -2,16 +2,18 @@
 import { OrderStatus, type Order } from '~/types/orders'
 import { useOrderManagement } from '~/composables/useOrderManagement'
 import { PaymentStatus } from '~/types/orders'
-import type { SelectMenuItem } from '@nuxt/ui'
 
 interface Props {
     orders: Order[]
     onStatusUpdate: (id: number, status: string) => void
+    detailLink?: string
 }
-
 const props = defineProps<Props>()
 const { formatDate } = useOrderManagement()
 const { t } = useI18n()
+if (!props.detailLink?.endsWith('/')){
+    console.error('detailLink should end with /')
+}
 
 
 const updatingOrder = ref({ id: -1, isUpdating: false })
@@ -144,32 +146,38 @@ const getActions = (status: string, isPaid: boolean = false) => [
                 </div>
 
                 <!-- Action buttons -->
-                <div v-else class="flex flex-wrap gap-2">
+                <div v-else class="flex justify-between">
                     <!-- Regular status transitions -->
-                    <UButton v-for="action in getActions(order.status, order.payment_status === PaymentStatus.Paid)" :key="action.next" :label="action.label"
-                        :icon="action.icon" :color="action.color" variant="subtle" size="sm"
-                        @click="handleStatusUpdate(order.id, action.next)" />
+                    <div class="flex flex-wrap gap-2">
+                        <UButton v-for="action in getActions(order.status, order.payment_status === PaymentStatus.Paid)"
+                            :key="action.next" :label="action.label" :icon="action.icon" :color="action.color"
+                            variant="subtle" size="sm" @click="handleStatusUpdate(order.id, action.next)" />
+                        <!-- Force Complete Modal (Delivered status only) -->
+                        <UModal
+                            v-if="order.status === OrderStatus.Delivered && order.payment_status === PaymentStatus.Paid"
+                            v-model:open="forceCompleteOpenMap[order.id]"
+                            :title="`${$t('orderManager.forceComplete')} — ${$t('order.title')} #${order.id}`"
+                            :description="$t('orderManager.forceCompleteConfirmation')">
+                            <!-- Trigger -->
+                            <UButton :label="$t('orderManager.forceComplete')" icon="i-lucide-shield-check"
+                                color="warning" variant="subtle" size="sm" @click="openForceComplete(order.id)" />
 
-                    <!-- Force Complete Modal (Delivered status only) -->
-                    <UModal v-if="order.status === OrderStatus.Delivered && order.payment_status === PaymentStatus.Paid"
-                        v-model:open="forceCompleteOpenMap[order.id]"
-                        :title="`${$t('orderManager.forceComplete')} — ${$t('order.title')} #${order.id}`"
-                        :description="$t('orderManager.forceCompleteConfirmation')">
-                        <!-- Trigger -->
-                        <UButton :label="$t('orderManager.forceComplete')" icon="i-lucide-shield-check" color="warning"
-                            variant="subtle" size="sm" @click="openForceComplete(order.id)" />
-
-                        <!-- Footer actions -->
-                        <template #footer>
-                            <div class="flex justify-end gap-2">
-                                <UButton :label="$t('btn.cancel')" color="neutral" variant="outline"
-                                    @click="closeForceComplete(order.id)" />
-                                <UButton :label="$t('btn.confirm')" color="success" icon="i-lucide-check"
-                                    @click="handleStatusUpdate(order.id, OrderStatus.Completed); closeForceComplete(order.id)" />
-                            </div>
-                        </template>
-                    </UModal>
-                    <!-- Payment confirm button -->
+                            <!-- Footer actions -->
+                            <template #footer>
+                                <div class="flex justify-end gap-2">
+                                    <UButton :label="$t('btn.cancel')" color="neutral" variant="outline"
+                                        @click="closeForceComplete(order.id)" />
+                                    <UButton :label="$t('btn.confirm')" color="success" icon="i-lucide-check"
+                                        @click="handleStatusUpdate(order.id, OrderStatus.Completed); closeForceComplete(order.id)" />
+                                </div>
+                            </template>
+                        </UModal>
+                    </div>
+                    <!-- view details -->
+                    <UButton v-if="detailLink" :to="`${detailLink}${order.id}`" color="primary" variant="solid"
+                        trailing-icon="i-lucide-arrow-right">
+                        {{ $t('orderList.viewDetails') }}
+                    </UButton>
                 </div>
             </template>
 

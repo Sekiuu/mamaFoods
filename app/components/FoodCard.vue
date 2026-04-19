@@ -8,19 +8,24 @@ const props = defineProps<{
         price?: string | number | null
         description?: string | null
         icon?: string | null
+        show?: boolean
     }
     addToCart?: (item: any) => void
 }>()
 </script>
 
 <template>
-    <UCard :ui="{ body: 'p-0', root: 'overflow-hidden' }">
+    <UCard :ui="{ body: 'p-0', root: 'overflow-hidden' }" :variant="props.item.show ? 'soft' : 'subtle'"
+    :class="{ 'opacity-50 pointer-events-none': !props.item.show }">
+        <template #header>
+            <UAlert v-if="!props.item.show" color="error" variant="soft" icon="i-lucide-circle-x" title="HIDDEN" />
+        </template>
         <!-- Food Image -->
-        <div class="h-48 relative overflow-hidden bg-gray-200 rounded-2xl">
+        <div class="h-48 relative overflow-hidden rounded-2xl">
             <img :src="props.item.icon ?? ''" :alt="props.item.name ?? ''" class="object-cover w-full h-full" />
             <!-- Price Tag -->
             <div
-                class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full font-bold text-orange-600 shadow-sm">
+                class="absolute top-4 right-4 backdrop-blur px-3 py-1 rounded-full font-bold text-orange-600 shadow-sm">
                 ฿{{ props.item.price }}
             </div>
         </div>

@@ -20,6 +20,7 @@ onMounted(async () => {
     try {
         const res = await fetch('/api/foods')
         menuItems.value = await res.json()
+        menuItems.value.filter(item => item.show)
     } catch (error) {
         console.error('Failed to fetch menu items:', error)
     } finally {

@@ -114,7 +114,7 @@ onMounted(async () => {
             </div>
         </template>
         <!-- Order Manager Tab -->
-        <OrderManager v-if="activeTab === TabsRepresents.manager" :orders="activeOrders as Order[]"
+        <OrderManager v-if="activeTab === TabsRepresents.manager" detail-link="orders/" :orders="activeOrders as Order[]"
             :on-status-update="handleStatusUpdate" />
 
 

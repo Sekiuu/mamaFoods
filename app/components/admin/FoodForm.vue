@@ -30,6 +30,7 @@
         <UButton type="button" color="neutral" variant="soft" @click="resetForm">
           {{ $t('admin.food.clearBtn') }}
         </UButton>
+        <UCheckbox v-model="formData.show" :label="$t('admin.food.show')" />
       </div>
     </UForm>
 
@@ -73,6 +74,7 @@ interface FormData {
   price: string
   description: string
   icon: string
+  show: boolean
 }
 
 const props = defineProps<{
@@ -94,10 +96,11 @@ const formData = ref<FormData>({
   price: '',
   description: '',
   icon: '',
+  show: true,
 })
 
 const resetForm = () => {
-  formData.value = { name: '', price: '', description: '', icon: '' }
+  formData.value = { name: '', price: '', description: '', icon: '', show: true }
   isEditing.value = false
   errorMessage.value = ''
   successMessage.value = ''
@@ -110,6 +113,7 @@ const loadEditingFood = () => {
       price: props.editingFood.price || '',
       description: props.editingFood.description || '',
       icon: props.editingFood.icon || '',
+      show: props.editingFood.show || false,
     }
     isEditing.value = true
   }
@@ -131,14 +135,14 @@ const submitForm = async () => {
         method: 'PUT',
         body: formData.value,
       })
-      successMessage.value = t('admin.food.successUpdate')
+      successMessage.value = $t('admin.food.successUpdate')
       emit('food-updated')
     } else {
       await $fetch('/api/foods', {
         method: 'POST',
         body: formData.value,
       })
-      successMessage.value = t('admin.food.successCreate')
+      successMessage.value = $t('admin.food.successCreate')
       emit('food-created')
     }
 

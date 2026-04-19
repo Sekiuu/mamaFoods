@@ -11,11 +11,45 @@ const config = useRuntimeConfig()
 const props = defineProps<{
   order: Ref<Order>
   cancelable: boolean
+  editable?: boolean
 }>()
+
+const isEditingMode = ref(false)
+const editForm = ref<Partial<Order>>({})
+const isSaving = ref(false)
 
 const qrDataUrl = ref('')
 const isConfirming = ref(false)
 const isGeneratingQR = ref(false)
+
+const startEditing = () => {
+  editForm.value = { ...props.order.value }
+  isEditingMode.value = true
+}
+
+const cancelEditing = () => {
+  isEditingMode.value = false
+  editForm.value = {}
+}
+
+const saveChanges = async () => {
+  if (!props.order.value.id) return
+  isSaving.value = true
+  try {
+    const data = await $fetch(`/api/orders/${props.order.value.id}`, {
+      method: 'PUT',
+      body: editForm.value,
+    })
+    props.order.value = data as Order
+    isEditingMode.value = false
+    toast.add({ title: $t('admin.toasts.orderUpdated'), color: 'success', icon: 'i-lucide-check-circle' })
+  } catch (error) {
+    console.error(error)
+    toast.add({ title: 'Failed to update order', color: 'error', icon: 'i-lucide-x-circle' })
+  } finally {
+    isSaving.value = false
+  }
+}
 
 const orderStatus = computed(() => props.order.value.status)
 const paymentStatus = computed(() => props.order.value.payment_status)
@@ -133,16 +167,33 @@ watch(orderStatus, (newValue) => {
 
     <!-- ── Header: Order ID + Date ── -->
     <template #header>
+      <UButton v-if="!isEditingMode && editable" color="primary" variant="solid" icon="i-lucide-edit" 
+      @click="isEditingMode = true" class="mb-4">
+        {{ $t('btn.edit') }}
+      </UButton>
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <div>
+        <div class="flex-1">
           <p class="text-sm text-muted">{{ $t('orderCard.orderId') }} #{{ order.value.id }}</p>
-          <p class="text-2xl font-bold">{{ $t('orderCard.orderSummary') }}</p>
+          <div v-if="isEditingMode" class="mt-2">
+            <UFormField :label="$t('customerInfo.name')">
+              <UInput v-model="editForm.customer_name" icon="i-lucide-user" />
+            </UFormField>
+          </div>
+          <p v-else class="text-2xl font-bold">
+            {{ order.value.customer_name || $t('orderCard.orderSummary') }}
+          </p>
         </div>
         <div class="sm:text-right space-y-1">
           <p class="text-sm text-muted">{{ $t('orderCard.orderDate') }}</p>
           <p class="font-semibold">{{ formattedDate }}</p>
           <p class="text-sm text-muted">{{ $t('customerInfo.phone') }}</p>
-          <p>{{ order.value.customer_phone }}</p>
+          <UInput v-if="isEditingMode" v-model="editForm.customer_phone" icon="i-lucide-phone" size="sm" />
+          <p v-else>{{ order.value.customer_phone }}</p>
+
+          <UButton v-if="editable && !isEditingMode && orderStatus === OrderStatus.Pending" 
+            variant="ghost" color="neutral" icon="i-lucide-pencil" size="xs" class="mt-1" @click="startEditing">
+            {{ $t('btn.edit') }}
+          </UButton>
         </div>
       </div>
 
@@ -179,7 +230,16 @@ watch(orderStatus, (newValue) => {
 
       <!-- Address & Note -->
       <div class="space-y-1 text-sm text-muted mb-4">
-        <p>
+        <div v-if="isEditingMode" class="space-y-2">
+          <UFormField :label="$t('customerInfo.address')">
+            <UTextarea v-model="editForm.customer_address" :rows="3" />
+          </UFormField>
+          <UFormField :label="$t('customerInfo.note')">
+            <UTextarea v-model="editForm.customer_note" :rows="2" />
+          </UFormField>
+        </div>
+        <template v-else>
+          <p>
           <UIcon name="i-lucide-map-pin" class="inline size-4 mr-1" />
           {{ $t('customerInfo.address') }}: {{ order.value.customer_address }}
         </p>
@@ -187,9 +247,20 @@ watch(orderStatus, (newValue) => {
           <UIcon name="i-lucide-notebook-pen" class="inline size-4 mr-1" />
           {{ $t('customerInfo.note') }}: {{ order.value.customer_note || 'None' }}
         </p>
+        </template>
       </div>
 
       <USeparator class="mb-4" />
+
+      <!-- Edit Actions -->
+      <div v-if="isEditingMode" class="flex gap-2 mb-4">
+        <UButton color="primary" icon="i-lucide-save" :loading="isSaving" @click="saveChanges">
+          {{ $t('btn.save') }}
+        </UButton>
+        <UButton color="neutral" variant="outline" icon="i-lucide-x" @click="cancelEditing">
+          {{ $t('btn.cancel') }}
+        </UButton>
+      </div>
 
       <!-- Payment QR Code -->
       <div v-if="paymentStatus !== PaymentStatus.Paid" class="mb-4">

@@ -3,7 +3,9 @@
         <h2 v-if="title" class="text-2xl font-bold">{{ title }}</h2>
 
         <div class="grid gap-6" :class="gridClass">
-            <FoodCard v-for="item in foods" :key="item.id" :item="item" :add-to-cart="addToCart" />
+            <FoodCard v-for="item in foods" 
+            :key="item.id" :item="item" 
+            :add-to-cart="addToCart" />
         </div>
     </div>
 </template>

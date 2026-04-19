@@ -21,7 +21,7 @@ const { isAdmin, isOperator } = useUserAuth();
                     <!-- Order Management -->
                     <UPageCard :title="$t('shop.management.order')" :description="$t('shop.management.orderDesc')" icon="mdi:receipt-text-edit">
                         <template #default>
-                            <NuxtLink to="/dashboard/orderDashBoard"
+                            <NuxtLink to="/dashboard/orders"
                                 class="ml-2 mt-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-md text-sm font-medium">
                                 {{ $t('btn.view') }}
                             </NuxtLink>

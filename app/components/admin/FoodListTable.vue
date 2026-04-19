@@ -45,6 +45,7 @@ const columns: TableColumn<FoodItem>[] = [
     { accessorKey: 'id', header: 'ID' },
     { accessorKey: 'name', header: 'Name' },
     { accessorKey: 'price', header: 'Price' },
+    { accessorKey: 'show', header: 'Is Showing' },
     { accessorKey: 'description', header: 'Description' },
     { accessorKey: 'icon', header: 'Icon' },
     {

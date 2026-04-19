@@ -26,6 +26,7 @@ export default defineEventHandler(async (event) => {
                     price: body.price,
                     description: body.description,
                     icon: body.icon,
+                    show: body.show?? false,
                     last_edit: new Date(),
                 },
             });

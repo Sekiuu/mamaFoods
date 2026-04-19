@@ -13,6 +13,7 @@ model foods {
   price       String?
   description String?
   icon        String?
+  show        Boolean?
   last_edit   DateTime? @db.Timestamptz(6)
 }
 

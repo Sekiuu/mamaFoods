@@ -36,6 +36,7 @@ export default defineEventHandler(async (event) => {
                     price: body.price || undefined,
                     description: body.description || undefined,
                     icon: body.icon || undefined,
+                    show: body.show || false,
                     last_edit: new Date(),
                 },
             });
