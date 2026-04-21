@@ -2,43 +2,39 @@
     <AdminHeader :title="$t('admin.header.food')" :enable-back="true" />
 
     <UPage>
-        <div class="container mx-auto px-4 py-8">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Left Column: Form -->
-                <div class="lg:col-span-1">
-                    <FoodForm :editing-food="editingFood" @food-created="loadFoods" @food-updated="loadFoods" />
-                </div>
+        <UContainer color="neutral" variant="soft" class="p-4 max-w-7xl">
+            <!-- Header -->
+            <UPageHeader class="mb-4 gap-4">
+                <!-- Food Form Modal (no default slot trigger — controlled manually) -->
+                <UModal v-model:open="isModalOpen" scrollable>
+                    <UButton :label="$t('admin.food.createBtn')" icon="i-lucide-plus" color="primary" 
+                        @click="editingFood = null"/>
+                    <template #content>
+                        <FoodForm :editing-food="editingFood" @food-created="onFoodSaved" @food-updated="onFoodSaved" />
+                    </template>
+                </UModal>
 
-                <!-- Right Column: List -->
-                <div class="lg:col-span-2">
-                    <!-- Header -->
-                    <UPageHeader class="mb-4 gap-4" >
-                        <!-- View Mode Options -->
-                        <USelect v-model="viewMode" :placeholder="$t('shop.viewMode.label')" :items="[
-                            { label: $t('shop.viewMode.table'), value: 'table' },
-                            { label: $t('shop.viewMode.grid'), value: 'grid' },
-                            ]"
-                            @change="handleViewModeChange" 
-                            class="w-fit mx-2"/>
-                        <!-- grid options -->
-                        <USelect v-if="viewMode === 'grid'" v-model.number="gridCols" title="Grid Collums"
-                            placeholder="Grid Collums" :items="[
-                                { label: `2 ${$t('admin.crud.search')}`, value: 2 },
-                                { label: `3 ${$t('admin.crud.search')}`, value: 3 }, 
-                                { label: `4 ${$t('admin.crud.search')}`, value: 4 }]"
-                            @change="(e: any) => gridCols = parseInt(e.target.value) || 3"
-                            class="w-fit mx-2" />
-                    </UPageHeader>
-                    <!-- Food List -->
-                    <UAlert color="info" variant="soft" v-if="isLoading" title="Loading..." class="text-center py-8" />
-                    <FoodListTable v-else-if="viewMode === 'table'" :foods="foods" @edit="startEdit"
-                        @delete="openDeleteDialog" />
-                    <FoodGrid v-else :foods="foods" :grid-cols="gridCols" @edit="startEdit"
-                        @delete="openDeleteDialog" />
-                </div>
+                <!-- View Mode Options -->
+                <USelect v-model="viewMode" :placeholder="$t('shop.viewMode.label')" :items="[
+                    { label: $t('shop.viewMode.table'), value: 'table' },
+                    { label: $t('shop.viewMode.grid'), value: 'grid' },
+                ]" @change="handleViewModeChange" class="mx-2" size="xl" />
 
-            </div>
-        </div>
+                <!-- Grid Options -->
+                <USelect v-if="viewMode === 'grid'" v-model.number="gridCols" title="Grid Columns"
+                    placeholder="Grid Columns" :items="[
+                        { label: `2 ${$t('admin.crud.search')}`, value: 2 },
+                        { label: `3 ${$t('admin.crud.search')}`, value: 3 },
+                        { label: `4 ${$t('admin.crud.search')}`, value: 4 }]"
+                    @change="(e: any) => gridCols = parseInt(e.target.value) || 3" class="w-fit mx-2" />
+            </UPageHeader>
+
+            <!-- Food List -->
+            <UAlert color="info" variant="soft" v-if="isLoading" title="Loading..." class="text-center py-8" />
+            <FoodListTable v-else-if="viewMode === 'table'" :foods="foods" @edit="startEdit"
+                @delete="openDeleteDialog" />
+            <FoodGrid v-else :foods="foods" :grid-cols="gridCols" @edit="startEdit" @delete="openDeleteDialog" />
+        </UContainer>
 
         <!-- Delete Confirmation Dialog -->
         <FoodDelete :food="foodToDelete" @food-deleted="loadFoods" @close="foodToDelete = null" />
@@ -49,31 +45,24 @@
 import FoodForm from '~/components/admin/FoodForm.vue'
 import FoodListTable from '~/components/admin/FoodListTable.vue'
 import FoodDelete from '~/components/admin/FoodDelete.vue'
-import PageHeader from '~/components/admin/AdminHeader.vue'
 import AdminHeader from '~/components/admin/AdminHeader.vue';
+import type { FoodItem } from '#shared/types';
+import { json } from 'node:stream/consumers';
 
-interface Food {
-    id: number;
-    name?: string | null;
-    price?: string | null;
-    description?: string | null;
-    icon?: string | null;
-    last_edit?: Date | null;
-}
 type ViewMode = "table" | "grid";
 
-const foods = ref<Food[]>([]);
+const foods = ref<FoodItem[]>([]);
 const isLoading = ref(true);
-const editingFood = ref<Food | null>(null);
-const foodToDelete = ref<Food | null>(null);
+const editingFood = ref<FoodItem | null>(null);
+const foodToDelete = ref<FoodItem | null>(null);
 const viewMode = ref<ViewMode>("table");
 const gridCols = ref(3);
+const isModalOpen = ref(false);
 
 const loadFoods = async () => {
     isLoading.value = true;
     try {
         foods.value = await fetch("/api/foods").then((res) => res.json());
-        editingFood.value = null;
     } catch (error) {
         console.error("Error loading foods:", error);
     } finally {
@@ -81,9 +70,16 @@ const loadFoods = async () => {
     }
 };
 
-const startEdit = (food: Food) => {
+const startEdit = (food: FoodItem) => {
     editingFood.value = food;
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    isModalOpen.value = true;
+    // console.log("Editing food:", JSON.stringify(food));
+};
+
+const onFoodSaved = () => {
+    isModalOpen.value = false;
+    editingFood.value = null;
+    loadFoods();
 };
 
 const openDeleteDialog = (foodId: number) => {
@@ -95,21 +91,10 @@ const openDeleteDialog = (foodId: number) => {
 
 const handleViewModeChange = (event: Event) => {
     const select = event.target as HTMLSelectElement;
-    // Handle view mode change logic here
-    console.log("Selected view mode:", select.value);
     viewMode.value = select.value as ViewMode;
 };
 
 onMounted(() => {
-
     loadFoods();
 });
 </script>
-
-<style scoped>
-.admin-dashboard {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    padding-bottom: 40px;
-}
-</style>

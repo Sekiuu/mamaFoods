@@ -1,4 +1,5 @@
 import { getPrismaClient } from '../../utils/prisma'
+import { FoodItem } from '#shared/types'
 
 const prisma = getPrismaClient()
 
@@ -28,7 +29,8 @@ export default defineEventHandler(async (event) => {
     if (event.req.method === "PUT") {
         // Update a food
         try {
-            const body = await readBody(event);
+            const body = await readBody(event) as FoodItem;
+            console.log("SERVER : Updating food with data:", body);
             const updatedFood = await prisma.foods.update({
                 where: { id },
                 data: {
@@ -37,6 +39,7 @@ export default defineEventHandler(async (event) => {
                     description: body.description || undefined,
                     icon: body.icon || undefined,
                     show: body.show || false,
+                    options: typeof body.options === 'string' ? body.options : JSON.stringify(body.options),
                     last_edit: new Date(),
                 },
             });

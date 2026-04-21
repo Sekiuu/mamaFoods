@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import type { Order } from '~/types'
+import type { Order } from '#shared/types'
 
 const { isAdmin, isOperator } = useUserAuth();
 

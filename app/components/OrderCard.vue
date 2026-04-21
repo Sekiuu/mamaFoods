@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import QRCode from 'qrcode'
-import type { Order, CartItem } from '~/types'
-import { OrderStatus, PaymentStatus } from '~/types/orders'
+import type { Order, CartItem } from '#shared/types'
+import { OrderStatus, PaymentStatus } from '#shared/types/orders'
 import generatePayload from 'promptpay-qr'
 
 const { locale: currentLocale, t: $t } = useI18n()
@@ -167,8 +167,8 @@ watch(orderStatus, (newValue) => {
 
     <!-- ── Header: Order ID + Date ── -->
     <template #header>
-      <UButton v-if="!isEditingMode && editable" color="primary" variant="solid" icon="i-lucide-edit" 
-      @click="isEditingMode = true" class="mb-4">
+      <UButton v-if="!isEditingMode && editable" color="primary" variant="solid" icon="i-lucide-edit"
+        @click="isEditingMode = true" class="mb-4">
         {{ $t('btn.edit') }}
       </UButton>
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -190,8 +190,8 @@ watch(orderStatus, (newValue) => {
           <UInput v-if="isEditingMode" v-model="editForm.customer_phone" icon="i-lucide-phone" size="sm" />
           <p v-else>{{ order.value.customer_phone }}</p>
 
-          <UButton v-if="editable && !isEditingMode && orderStatus === OrderStatus.Pending" 
-            variant="ghost" color="neutral" icon="i-lucide-pencil" size="xs" class="mt-1" @click="startEditing">
+          <UButton v-if="editable && !isEditingMode && orderStatus === OrderStatus.Pending" variant="ghost"
+            color="neutral" icon="i-lucide-pencil" size="xs" class="mt-1" @click="startEditing">
             {{ $t('btn.edit') }}
           </UButton>
         </div>
@@ -206,24 +206,13 @@ watch(orderStatus, (newValue) => {
 
     <!-- ── Body: Order Items ── -->
     <div class="space-y-3">
-      <UCard v-for="item in orderItems" :key="item.id" variant="subtle">
-        <div class="flex items-center justify-between gap-4">
-          <div>
-            <p class="font-semibold">{{ item.name }}</p>
-            <p class="text-sm text-muted">{{ item.description }}</p>
-          </div>
-          <div class="text-right shrink-0">
-            <p class="font-semibold">฿{{ item.price * item.quantity }}</p>
-            <p class="text-sm text-muted">{{ item.quantity }} × ฿{{ item.price }}</p>
-          </div>
-        </div>
-      </UCard>
+      <OrderedFoodItemsList :orderItems="orderItems" />
     </div>
 
     <!-- ── Footer: Total, Address, Actions ── -->
     <template #footer>
       <!-- Total -->
-      <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center gap-4 mb-3">
         <span class="text-lg font-semibold">{{ $t('shop.cart.total') }}</span>
         <span class="text-2xl font-bold text-primary">฿{{ order.value.total_price }}</span>
       </div>
@@ -240,13 +229,13 @@ watch(orderStatus, (newValue) => {
         </div>
         <template v-else>
           <p>
-          <UIcon name="i-lucide-map-pin" class="inline size-4 mr-1" />
-          {{ $t('customerInfo.address') }}: {{ order.value.customer_address }}
-        </p>
-        <p>
-          <UIcon name="i-lucide-notebook-pen" class="inline size-4 mr-1" />
-          {{ $t('customerInfo.note') }}: {{ order.value.customer_note || 'None' }}
-        </p>
+            <UIcon name="i-lucide-map-pin" class="inline size-4 mr-1" />
+            {{ $t('customerInfo.address') }}: {{ order.value.customer_address }}
+          </p>
+          <p>
+            <UIcon name="i-lucide-notebook-pen" class="inline size-4 mr-1" />
+            {{ $t('customerInfo.note') }}: {{ order.value.customer_note || 'None' }}
+          </p>
         </template>
       </div>
 

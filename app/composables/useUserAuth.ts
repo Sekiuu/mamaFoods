@@ -1,4 +1,4 @@
-import { Role } from '~/types/users'
+import { Role } from '#shared/types/users'
 
 export const useUserAuth = () => {
     const { fetch: refreshSession, session } = useUserSession()

@@ -37,8 +37,8 @@
 </template>
 
 <script setup lang="ts">
-import type { UserItem } from '../../types'
-import { roles, Role } from '~/types/users'
+import type { UserItem } from '#shared/types'
+import { roles, Role } from '#shared/types/users'
 import * as v from 'valibot'
 
 const schema = computed(() =>

@@ -23,7 +23,7 @@ import UserForm from "~/components/admin/UserForm.vue";
 import UserListTable from "~/components/admin/UserListTable.vue";
 import UserDelete from "~/components/admin/UserDelete.vue";
 import AdminHeader from '~/components/admin/AdminHeader.vue'
-import type { UserItem } from "~/types";
+import type { UserItem } from "#shared/types";
 
 const users = ref<UserItem[]>([]);
 const isLoading = ref(true);

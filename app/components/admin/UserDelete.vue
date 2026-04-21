@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import type { UserItem } from '../../types'
+import type { UserItem } from '#shared/types'
 
 const props = defineProps<{
   user: UserItem | null

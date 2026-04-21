@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Order } from '~/types'
-import { OrderStatus, PaymentStatus } from '~/types/orders'
+import type { Order } from '#shared/types'
+import { OrderStatus, PaymentStatus } from '#shared/types/orders'
 const props = defineProps<{
     orders: Order[]
     formatDate: (value: string | Date | null) => string

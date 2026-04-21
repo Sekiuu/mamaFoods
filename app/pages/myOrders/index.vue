@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Order } from '~/types'
-import { OrderStatus, PaymentStatus } from '~/types/orders'
+import type { Order } from '#shared/types'
+import { OrderStatus, PaymentStatus } from '#shared/types/orders'
 import type { TabsItem } from '@nuxt/ui'
 
 const ORDER_IDS_COOKIE = process.env.ORDER_IDS_COOKIE || 'mamaFoodOrderIds'

@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import type { UserItem } from '../../types'
+import type { UserItem } from '#shared/types'
 
 defineProps<{
   users: UserItem[]

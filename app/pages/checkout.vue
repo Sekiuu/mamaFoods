@@ -1,136 +1,8 @@
-<template>
-    <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-2xl mx-auto">
-            <!-- Header -->
-            <div class="text-center mb-8">
-                <p class="text-gray-600">
-                    {{ $t('checkout.subtitle') }}
-                </p>
-            </div>
-
-            <!-- Order Summary -->
-            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 mb-8">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                    {{ $t('checkout.orderSummary.title') }}
-                </h2>
-
-                <!-- Order Items -->
-                <div class="space-y-4 mb-8">
-                    <div v-for="item in cartItems" :key="item.id"
-                        class="flex justify-between items-center py-4 border-b border-gray-100 last:border-b-0">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-2xl">
-                                <img :src="item.icon" :alt="item.icon" class="w-full h-full object-cover rounded-xl">
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-800">{{ item.name }}</h3>
-                                <p class="text-sm text-gray-500">{{ item.description }}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-semibold text-gray-800">฿{{ item.price * item.quantity }}</p>
-                            <p class="text-sm text-gray-500">฿{{ item.price }} x {{ item.quantity }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Order Total -->
-                <div class="border-t border-gray-200 pt-6 text-gray-800">
-                    <div class="flex justify-between items-center text-xl font-bold">
-                        <span>
-                            {{ $t('checkout.orderSummary.total') }}
-                        </span>
-                        <span class="text-orange-600 font-mono">
-                            ฿{{ totalPrice }}
-                        </span>
-                    </div>
-                    <div class="flex justify-between items-center text-sm text-gray-500 mt-1">
-                        <span>
-                            {{ $t('checkout.orderSummary.totalItems') }}
-                        </span>
-                        <span>
-                            {{ totalItems }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Customer Information Form (Optional) -->
-            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 mb-8">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                    {{ $t('customerInfo.title') }}
-                </h2>
-                <!-- Success/Error Messages -->
-                <div v-if="message.text"
-                    :class="message.type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700'"
-                    class="my-6 p-4 border rounded-xl">
-                    {{ message.text }}
-                </div>
-                <!-- Customer Information Form-->
-                <form @submit.prevent="confirmOrder" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                {{ $t('customerInfo.name') }}
-                                <span class="text-red-500">*</span>
-                            </label>
-                            <input v-model="customerInfo.name" type="name" required placeholder="Enter your full name"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent" />
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                {{ $t('customerInfo.phone') }}
-                                <span class="text-red-500">*</span>
-                            </label>
-                            <input v-model="customerInfo.phone" type="tel" required
-                                placeholder="Enter your phone number"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent" />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ $t('customerInfo.address') }}
-                            <span class="text-red-500">*</span>
-                        </label>
-                        <textarea v-model="customerInfo.address" required rows="3"
-                            placeholder="Enter your delivery address"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            {{ $t('customerInfo.note') }}
-                        </label>
-                        <textarea v-model="customerInfo.instructions" rows="2"
-                            placeholder="Any special requests or instructions..."
-                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"></textarea>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex gap-4">
-                <button @click="cancelOrder"
-                    class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-4 px-6 rounded-2xl transition-all">
-                    Cancel Order
-                </button>
-
-                <button @click="confirmOrder" :disabled="isProcessing"
-                    class="flex-1 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 text-white font-semibold py-4 px-6 rounded-2xl transition-all shadow-lg disabled:cursor-not-allowed">
-                    {{ isProcessing ? 'Processing...' : 'Confirm Order' }}
-                </button>
-            </div>
-        </div>
-    </div>
-</template>
-
 <script setup lang="ts">
-import type { CartItem, CustomerInfo } from '~/types'
-import { OrderStatus } from '~/types/orders';
-import { useCustomerInfoValidate } from '~/composables/useCustomerInfoValidate'
-import { useToast } from '#imports';
+import type { FormError, FormSubmitEvent } from '@nuxt/ui'
+import type { CartItem, CustomerInfo } from '#shared/types'
+import { OrderStatus } from '#shared/types/orders'
+
 definePageMeta({
     middleware: ['auth-cart']
 })
@@ -140,6 +12,8 @@ const CUSTOMER_INFO_KEY = process.env.CUSTOMER_INFO_KEY || 'mamaFoodCustomerInfo
 const ORDER_IDS_COOKIE = process.env.ORDER_IDS_COOKIE || 'mamaFoodOrderIds'
 
 const router = useRouter()
+const toast = useToast()
+
 const orderIdsCookie = useCookie<number[]>(ORDER_IDS_COOKIE, {
     default: () => [],
     maxAge: 60 * 60 * 24 * 30,
@@ -147,12 +21,10 @@ const orderIdsCookie = useCookie<number[]>(ORDER_IDS_COOKIE, {
 const cartItemsCookie = useCookie<CartItem[] | null>(CART_KEY)
 const customerInfoCookie = useCookie<CustomerInfo | null>(CUSTOMER_INFO_KEY)
 
-const cartItems = ref<CartItem[] | null>([])
-
+const cartItems = ref<CartItem[]>([])
 const isProcessing = ref(false)
-const message = ref({ text: '', type: '' })
 
-const customerInfo = ref<CustomerInfo>({
+const state = reactive<CustomerInfo>({
     name: '',
     phone: '',
     address: '',
@@ -160,94 +32,152 @@ const customerInfo = ref<CustomerInfo>({
 })
 
 onMounted(() => {
-    if (cartItemsCookie.value) {
-        cartItems.value = cartItemsCookie.value
-    }
-
-    if (customerInfoCookie.value != null) {
-        customerInfo.value = customerInfoCookie.value
-    }
+    if (cartItemsCookie.value) cartItems.value = cartItemsCookie.value
+    if (customerInfoCookie.value) Object.assign(state, customerInfoCookie.value)
 })
 
-const totalItems = computed((): number => {
-    return cartItems.value ? cartItems.value.reduce((sum, item) => sum + (item.quantity || 0), 0) : 0
-})
-const totalPrice = computed((): number => {
-    return cartItems.value ? cartItems.value.reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 0)), 0) : 0
+onUnmounted(() => {
+    customerInfoCookie.value = { ...state }
 })
 
-const { isFormValid, errors } = useCustomerInfoValidate(customerInfo);
+// ── Computed ──────────────────────────────────────────────────
+const totalItems = computed(() =>
+    cartItems.value.reduce((sum, item) => sum + (item.quantity || 0), 0)
+)
 
+const totalPrice = computed(() =>
+    cartItems.value.reduce((sum, item) => sum + ((item.total_price || 0) * (item.quantity || 0)), 0)
+)
+
+// ── Validation ────────────────────────────────────────────────
+const validate = (data: Partial<CustomerInfo>): FormError[] => {
+    const errors: FormError[] = []
+    if (!data.name?.trim()) errors.push({ name: 'name', message: 'Full name is required' })
+    if (!data.phone?.trim()) errors.push({ name: 'phone', message: 'Phone number is required' })
+    if (!data.address?.trim()) errors.push({ name: 'address', message: 'Delivery address is required' })
+    return errors
+}
+
+// ── Actions ───────────────────────────────────────────────────
 const cancelOrder = () => {
     cartItemsCookie.value = null
     router.push('/shop')
 }
 
-const confirmOrder = async () => {
-    if (!isFormValid.value) {
-        useToast().add(
-            {
-                title: 'Please fill in all required fields.',
-                description: errors.value.name || errors.value.phone || errors.value.address,
-                color: 'error',
-                class: 'bg-red-200',
-            }
-        )
-        message.value = {
-            text: errors.value.name || errors.value.phone || errors.value.address,
-            type: 'error',
-        }
-        return
-    }
-
+const confirmOrder = async (_event: FormSubmitEvent<CustomerInfo>) => {
     isProcessing.value = true
-    message.value = { text: '', type: '' }
-
     try {
         const payload = {
-            customer_name: customerInfo.value.name,
-            customer_phone: customerInfo.value.phone,
-            customer_address: customerInfo.value.address,
-            customer_note: customerInfo.value.instructions,
+            customer_name: state.name,
+            customer_phone: state.phone,
+            customer_address: state.address,
+            customer_note: state.instructions,
             items: cartItems.value,
             total_price: totalPrice.value,
             status: OrderStatus.Pending,
         }
 
-        const order = await $fetch<any>('/api/orders', {
+        const order = await $fetch<{ id: number }>('/api/orders', {
             method: 'POST',
             body: payload,
-        }) as any
+        })
 
-        // อัปเดตรายการ Order ID ใน Cookie
         orderIdsCookie.value = Array.from(new Set([...orderIdsCookie.value, order.id]))
-        // ล้างข้อมูลตะกร้าใน Cookie
         cartItemsCookie.value = null
-        // Save customer info to cookie
-        customerInfoCookie.value = customerInfo.value
+        customerInfoCookie.value = { ...state }
 
-        console.log('Order placed successfully!',
-            customerInfoCookie.value,
-            cartItemsCookie.value,
-            orderIdsCookie.value)
-        // แสดงข้อความสำเร็จ
-        message.value = {
-            text: 'Order placed successfully!',
-            type: 'success',
-        }
+        toast.add({
+            title: 'Order placed successfully!',
+            description: `Order #${order.id} is being prepared.`,
+            color: 'success',
+            icon: 'i-lucide-check-circle',
+        })
 
         router.push(`/myOrders/${order.id}`)
-    } catch (error) {
-        message.value = {
-            text: 'Failed to place order. Please try again.',
-            type: 'error',
-        }
+    } catch {
+        toast.add({
+            title: 'Failed to place order',
+            description: 'Please try again.',
+            color: 'error',
+            icon: 'i-lucide-x-circle',
+        })
     } finally {
         isProcessing.value = false
     }
 }
-onUnmounted(() => {
-    // บันทึกข้อมูลลูกค้าลงใน Cookie เมื่อออกจากหน้า
-    customerInfoCookie.value = customerInfo.value
-})
 </script>
+
+<template>
+    <UPage class="mx-auto max-w-7xl px-4 py-8">
+        <UPageHeader :title="$t('checkout.subtitle')" icon="i-lucide-shopping-bag"
+            :ui="{ title: 'text-2xl font-bold text-center w-full' }" />
+
+        <UPageBody class="max-w-2xl mx-auto space-y-6">
+            <!-- ── Order Summary ── -->
+            <UCard>
+                <template #header>
+                    <p class="text-xl font-bold">{{ $t('checkout.orderSummary.title') }}</p>
+                </template>
+
+                <!-- Items -->
+                <div class="divide-y divide-default">
+                    <OrderedFoodItemsList :order-items="cartItems" />
+                </div>
+
+                <template #footer>
+                    <div class="space-y-1">
+                        <div class="flex justify-between items-center text-xl font-bold">
+                            <span>{{ $t('checkout.orderSummary.total') }}</span>
+                            <span class="text-primary font-mono">฿{{ totalPrice }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm text-muted">
+                            <span>{{ $t('checkout.orderSummary.totalItems') }}</span>
+                            <span>{{ totalItems }}</span>
+                        </div>
+                    </div>
+                </template>
+            </UCard>
+            <!-- ── Customer Info Form ── -->
+            <UForm :state="state" :validate="validate" :validate-on="['change', 'blur']" class="space-y-5"
+                @submit="confirmOrder">
+                <UCard :ui="{ body: 'p-6 space-y-4',}">
+                    <template #header>
+                        <p class="text-xl font-bold">{{ $t('customerInfo.title') }}</p>
+                    </template>
+                    <!-- Name + Phone row -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <UFormField :label="$t('customerInfo.name')" name="name" required>
+                            <UInput v-model="state.name" placeholder="Enter your full name" leading-icon="i-lucide-user"
+                                class="w-full" />
+                        </UFormField>
+
+                        <UFormField :label="$t('customerInfo.phone')" name="phone" required>
+                            <UInput v-model="state.phone" type="tel" placeholder="Enter your phone number"
+                                leading-icon="i-lucide-phone" class="w-full" />
+                        </UFormField>
+                    </div>
+
+                    <!-- Address -->
+                    <UFormField :label="$t('customerInfo.address')" name="address" required>
+                        <UTextarea v-model="state.address" placeholder="Enter your delivery address" :rows="3"
+                            class="w-full" />
+                    </UFormField>
+
+                    <!-- Note -->
+                    <UFormField :label="$t('customerInfo.note')" name="instructions">
+                        <UTextarea v-model="state.instructions" placeholder="Any special requests or instructions..."
+                            :rows="2" class="w-full" />
+                    </UFormField>
+
+                    <!-- Action buttons inside the form so submit works -->
+                    <div class="flex gap-3 pt-2">
+                        <UButton label="Cancel Order" color="neutral" variant="outline" icon="i-lucide-x" block
+                            type="button" @click="cancelOrder" />
+                        <UButton :label="isProcessing ? 'Processing...' : 'Confirm Order'" color="primary"
+                            icon="i-lucide-check" block type="submit" :loading="isProcessing" />
+                    </div>
+                </UCard>
+            </UForm>
+        </UPageBody>
+    </UPage>
+</template>

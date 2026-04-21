@@ -1,4 +1,4 @@
-import { PaymentStatus, type Order } from '~/types/orders'
+import { PaymentStatus, type Order } from '#shared/types/orders'
 
 export const useOrderManagement = () => {
     const orders = ref<Order[]>([])

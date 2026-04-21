@@ -180,6 +180,12 @@
             "updateBtn": "Update",
             "createBtn": "Create",
             "clearBtn": "Clear",
+            "optionName": "Additional Option (e.g., Size, Side Dish)",
+            "optionPrice": "Additional Price",
+            "addOption": "Add Option",
+            "setOptionDefault": "Set as Default Option",
+            "removeOption": "Remove Option",
+            "noOptions": "No additional options",
             "successUpdate": "Food item updated successfully!",
             "successCreate": "Food item created successfully!"
         },
@@ -208,7 +214,9 @@
         "edit": "Edit",
         "delete": "Delete",
         "save": "Save Changes",
-        "view": "View Details"
+        "view": "View Details",
+        "copy": "Copy",
+        "paste": "Paste"
     },
     "tabs": {
         "manager": "Manager",

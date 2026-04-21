@@ -1,7 +1,7 @@
 
 <script setup lang="ts">
 
-import type { Order } from '~/types'
+import type { Order } from '#shared/types'
 
 const poolingInterval = 3000 //3 seconds
 let timer: any = null;

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { h, resolveComponent } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
-import { OrderStatus, PaymentStatus, type Order } from '~/types/orders'
+import { OrderStatus, PaymentStatus, type Order } from '#shared/types/orders'
 import { useOrderManagement } from '~/composables/useOrderManagement'
 
 interface Props {

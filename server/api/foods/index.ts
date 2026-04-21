@@ -27,6 +27,7 @@ export default defineEventHandler(async (event) => {
                     description: body.description,
                     icon: body.icon,
                     show: body.show?? false,
+                    options: typeof body.options === 'string' ? body.options : JSON.stringify(body.options),
                     last_edit: new Date(),
                 },
             });

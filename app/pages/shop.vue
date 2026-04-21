@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { FoodItem } from '~/types'
+import type { FoodItem, CartItem } from '#shared/types'
+
 
 const { t: $t } = useI18n()
 const CART_KEY = process.env.CART_KEY || 'mamaFoodCart'
@@ -9,9 +10,6 @@ const loading = ref(false)
 const cartOpen = ref(false)
 const toast = useToast()
 const isAnimating = ref(false)
-interface CartItem extends FoodItem {
-    quantity: number
-}
 
 const menuItems = ref<FoodItem[]>([])
 
@@ -30,14 +28,26 @@ onMounted(async () => {
 
 const cartItems = ref<CartItem[]>([])
 
-const addToCart = (item: FoodItem) => {
+const addToCart = (item: CartItem) => {
     isAnimating.value = true
     setTimeout(() => isAnimating.value = false, 300)
-    const existing = cartItems.value.find((c): c is CartItem => c.id === item.id)
+
+    // Check if item with same options already exists in cart
+    const existing = cartItems.value.find((c): c is CartItem => c.food_id === item.food_id && 
+        JSON.stringify(c.options) === JSON.stringify(item.options))
+    
     toast.add({
-        title: $t('shop.cart.added', { item: item.name }),
+        title: $t('shop.cart.added', { item: item.food_name }),
         color: 'success',
-        description: $t('shop.cart.addedDesc', { item: item.name, count: existing ? existing.quantity + 1 : 1 }),
+        type: 'background',
+        close:{
+            color: 'primary',
+            variant: 'soft',
+        },
+        onClick: () => {
+            cartOpen.value = true
+        },
+        description: $t('shop.cart.addedDesc', { item: item.food_name, count: existing ? existing.quantity + 1 : 1 }),
     })
     if (existing) {
         existing.quantity++
@@ -47,7 +57,7 @@ const addToCart = (item: FoodItem) => {
 }
 
 const removeFromCart = (id: number) => {
-    const index = cartItems.value.findIndex(c => c.id === id)
+    const index = cartItems.value.findIndex(c => c.food_id === id)
     if (index !== -1) {
         const cartItem = cartItems.value[index]
         if (!cartItem) return
@@ -64,7 +74,7 @@ const totalItems = computed(() =>
 )
 
 const totalPrice = computed(() =>
-    cartItems.value.reduce((sum, item) => sum + (Number(item.price) || 0) * item.quantity, 0)
+    cartItems.value.reduce((sum, item) => sum + (Number(item.total_price) || 0) * item.quantity, 0)
 )
 
 const checkout = () => {
@@ -102,15 +112,22 @@ const checkout = () => {
                         <p class="text-muted">{{ $t('shop.cart.empty') }}</p>
                     </div>
                     <div v-else class="space-y-3">
-                        <div v-for="cartItem in cartItems" :key="cartItem.id"
+                        <div v-for="cartItem in cartItems" :key="cartItem.food_id"
                             class="flex justify-between items-center bg-elevated p-3 rounded-2xl">
                             <div class="min-w-0 mr-2">
-                                <p class="font-bold text-sm truncate">{{ cartItem.name }}</p>
-                                <p class="text-xs text-muted">฿{{ cartItem.price }} x {{ cartItem.quantity }}</p>
+                                <p class="font-bold text-sm truncate">{{ cartItem.food_name }}</p>
+                                <p class="text-xs text-muted">฿{{ cartItem.total_price }} x {{ cartItem.quantity }}</p>
+                                <!-- Options Preview -->
+                                <div v-if="cartItem.options && cartItem.options.length > 0" class="mt-1 flex flex-wrap gap-1">
+                                    <span v-for="opt in cartItem.options" :key="opt.name"
+                                        class="text-[10px] text-muted-foreground/70 italic">
+                                        • {{ opt.name }}
+                                    </span>
+                                </div>
                             </div>
                             <div class="flex items-center gap-1 shrink-0">
                                 <UButton icon="i-lucide-minus" color="neutral" variant="ghost" size="xs"
-                                    @click="removeFromCart(cartItem.id)" />
+                                    @click="removeFromCart(cartItem.food_id)" />
                                 <span class="font-mono text-sm w-5 text-center">{{ cartItem.quantity }}</span>
                                 <UButton icon="i-lucide-plus" color="warning" variant="ghost" size="xs"
                                     @click="addToCart(cartItem)" />

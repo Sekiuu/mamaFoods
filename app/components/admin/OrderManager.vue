@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { OrderStatus, type Order } from '~/types/orders'
+import { OrderStatus, type Order, PaymentStatus } from '#shared/types/orders'
 import { useOrderManagement } from '~/composables/useOrderManagement'
-import { PaymentStatus } from '~/types/orders'
 
 interface Props {
     orders: Order[]

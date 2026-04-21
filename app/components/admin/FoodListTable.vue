@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import type { FoodItem } from '../../types'
+import type { FoodItem } from '#shared/types'
 
 defineProps<{
     foods: FoodItem[]

@@ -1,13 +1,14 @@
+
+<script setup lang="ts">
+import type { ToasterProps } from '@nuxt/ui';
+import * as locales from '@nuxt/ui/locale'
+const { isAdmin, isOperator } = useUserAuth();
+const { locale } = useI18n()
+const toaster = { position: 'bottom-left' } as ToasterProps
+</script>
 <template>
-    <UApp :locale="locales[locale]">
+    <UApp :locale="locales[locale]" :toaster="toaster">
         <Nav title="Mama Food" :showDashBoard="isAdmin || isOperator" />
         <NuxtPage />
     </UApp>
 </template>
-
-<script setup lang="ts">
-import * as locales from '@nuxt/ui/locale'
-const { isAdmin, isOperator } = useUserAuth();
-
-const { locale } = useI18n()
-</script>

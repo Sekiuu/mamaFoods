@@ -1,5 +1,5 @@
 import { computed, type Ref } from 'vue'
-import type { CustomerInfo } from "~/types"
+import type { CustomerInfo } from "#shared/types"
 
 export const useCustomerInfoValidate = (customerInfo: Ref<CustomerInfo>) => {
   const { t } = useI18n()

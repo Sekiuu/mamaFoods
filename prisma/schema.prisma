@@ -14,6 +14,7 @@ model foods {
   description String?
   icon        String?
   show        Boolean?
+  options     String? // JSON string of options
   last_edit   DateTime? @db.Timestamptz(6)
 }
 

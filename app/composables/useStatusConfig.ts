@@ -1,5 +1,5 @@
 // Colors for order status tags
-import { OrderStatus } from '~/types/orders'
+import { OrderStatus } from '#shared/types/orders'
 
 export const useStatusConfig = () => {
     const statusConfig: Record<string, { color: "warning" | "info" | "success" | "error" | "neutral" | "secondary" | "primary", icon: string }> = {
