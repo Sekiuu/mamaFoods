@@ -30,6 +30,12 @@ export default defineEventHandler(async (event) => {
         // Update a food
         try {
             const body = await readBody(event) as FoodItem;
+
+            // If options is an object, stringify it before saving to the database
+            if (body.options && typeof body.options === 'object') {
+                body.options = JSON.stringify(body.options);
+            }
+
             console.log("SERVER : Updating food with data:", body);
             const updatedFood = await prisma.foods.update({
                 where: { id },
@@ -39,7 +45,7 @@ export default defineEventHandler(async (event) => {
                     description: body.description || undefined,
                     icon: body.icon || undefined,
                     show: body.show || false,
-                    options: typeof body.options === 'string' ? body.options : JSON.stringify(body.options),
+                    options: body.options,
                     last_edit: new Date(),
                 },
             });
