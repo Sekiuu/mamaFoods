@@ -59,10 +59,14 @@ const loadEditingFood = () => {
       description: props.editingFood.description || '',
       icon: props.editingFood.icon || '',
       show: props.editingFood.show || false,
-      options: typeof props.editingFood.options === 'string' ? JSON.parse(props.editingFood.options) : props.editingFood.options,
+      options: 
+      typeof props.editingFood.options === 'string' ?
+      JSON.parse(props.editingFood.options) as FoodOption[]
+      : props.editingFood.options,
     }
     isEditing.value = true
   }
+  console.log('Loaded food for editing:', formData.value);
 }
 
 const { getImageURL } = useDriveImage()
