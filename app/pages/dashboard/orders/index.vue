@@ -25,6 +25,8 @@ const activeOrders = computed(() => {
         filtered = filtered.filter(o =>
             String(o.id).includes(keyword) ||
             String(o.total_price).includes(keyword) ||
+            String(o.customer_address).includes(keyword) ||
+            String(o.customer_phone).includes(keyword) ||
             o.items.includes(keyword) ||
             o.customer_name.toLowerCase().includes(keyword)
         )
