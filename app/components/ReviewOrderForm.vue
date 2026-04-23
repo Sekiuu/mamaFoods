@@ -2,6 +2,8 @@
 import type { ReviewData } from '#shared/types'
 import * as v from 'valibot'
 import { Role } from '#shared/types/users'
+import type { Select } from '@prisma/client/runtime/client';
+import type { SelectItem } from '@nuxt/ui';
 const props = defineProps<{
     orderId: number
     onCancel?: () => void
@@ -72,9 +74,9 @@ const cancelReview = () => {
             <UFormField v-if="[Role.ADMIN, Role.OPERATOR].includes(session?.user?.role)" :label="$t('role.roles')" name="reviewer_role">
                 <USelect v-model="formData.reviewer_role" class=" min-w-32" :items="[
                     { label: $t('role.customer'), value: Role.CUSTOMER },
-                    { label: $t('role.admin'), value: Role.ADMIN },
                     { label: $t('role.operator'), value: Role.OPERATOR },   
-                ]" />
+                    { label: $t('role.admin'), value: Role.ADMIN, disabled: session?.user?.role !== Role.ADMIN },
+                ] as SelectItem[]" />
             </UFormField>
 
             <USeparator />

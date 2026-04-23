@@ -3,7 +3,8 @@ import { useOrderManagement } from '~/composables/useOrderManagement'
 import AdminHeader from '~/components/admin/AdminHeader.vue'
 import OrderManager from '~/components/admin/OrderManager.vue'
 import OrderCrud from '~/components/admin/OrderCrud.vue'
-import type { Order } from '#shared/types'
+import { type Order } from '#shared/types'
+import { Role } from '#shared/types/users'
 import type { TabsItem } from '@nuxt/ui'
 import { OrderStatus, PaymentStatus } from '#shared/types/orders'
 import type { SelectMenuItem } from '@nuxt/ui'
@@ -40,16 +41,19 @@ const filterOptions: Array<SelectMenuItem> = [
     { label: t('payment.unpaid'), value: PaymentStatus.Unpaid, icon: 'i-lucide-ban' },
 ]
 
+const { isAdmin } = useUserAuth()
 const tabs: TabsItem[] = [
     {
         label: t('tabs.manager'),
         value: 'manager',
         icon: 'i-lucide-list'
+
     },
     {
         label: t('tabs.crud'),
         value: 'crud',
-        icon: 'i-lucide-list'
+        icon: 'i-lucide-list',
+        disabled: !isAdmin.value
     }
 ]
 const {
