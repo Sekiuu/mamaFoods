@@ -386,7 +386,7 @@ watch(
                 <UTooltip :text="$t('admin.food.setOptionDefault')">
                   <UCheckbox
                     v-model="choice.default"
-                    @update:model-value="(val) => {
+                    @update:model-value="(val : any) => {
                       if (val && option.type === 'single') {
                         (option.choices as FoodOptionChoice[]).forEach((c, i) => {
                           if (i !== cIndex) c.default = false

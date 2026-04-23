@@ -136,6 +136,8 @@ const generateQr = async () => {
   }
 }
 
+const reviewModal = ref(false)
+
 onMounted(async () => {
   if (paymentStatus.value !== PaymentStatus.Paid) await generateQr()
 })
@@ -167,6 +169,10 @@ watch(orderStatus, (newValue) => {
 
     <!-- ── Header: Order ID + Date ── -->
     <template #header>
+      <!-- Status badge -->
+      <div class="my-3 flex items-center gap-2">
+        <OrderStatusTag :status="orderStatus" class="flex w-full justify-center" />
+      </div>
       <UButton v-if="!isEditingMode && editable" color="primary" variant="solid" icon="i-lucide-edit"
         @click="isEditingMode = true" class="mb-4">
         {{ $t('btn.edit') }}
@@ -195,12 +201,6 @@ watch(orderStatus, (newValue) => {
             {{ $t('btn.edit') }}
           </UButton>
         </div>
-      </div>
-
-      <!-- Status badge -->
-      <div class="mt-3 flex items-center gap-2">
-        <span class="text-sm text-muted">{{ $t('order.status.title') }}:</span>
-        <OrderStatusTag :status="orderStatus" />
       </div>
     </template>
 
@@ -268,23 +268,34 @@ watch(orderStatus, (newValue) => {
 
       <!-- Completed state -->
       <UAlert v-if="orderStatus === OrderStatus.Completed" color="success" variant="subtle" icon="i-lucide-check-circle"
-        :title="$t('orderCard.completed')" :description="$t('orderCard.ratingAndReviewDesc')" class="mb-4" />
+        :title="$t('orderCard.completed')" :description="$t('orderCard.ratingAndReviewDesc')" orientation="horizontal" class="mb-4">
+        <template #actions>
+          <UButton color="primary" variant="solid" icon="i-lucide-star" @click="reviewModal = true">
+            {{ $t('orderCard.writeReview') }}
+          </UButton>
+        </template>
+      </UAlert>
 
       <!-- Delivery confirmation -->
       <UAlert v-if="showConfirmBlock" color="warning" variant="subtle" icon="i-lucide-package-check"
         :title="$t('order.status.delivered')" :description="$t('orderCard.confirmReceiptDesc')" orientation="horizontal"
-        :actions="[{
-          label: $t('orderCard.confirmReceipt'),
-          color: 'success',
-          loading: isConfirming,
-          onClick: onConfirmOrder,
-        }]" class="mb-4" />
+        class="mb-4">
+        <template #actions>
+          <UButton color="success" :loading="isConfirming" @click="onConfirmOrder">
+            {{ $t('orderCard.confirmReceipt') }}
+          </UButton>
+        </template>
+      </UAlert>
 
       <!-- Cancel button -->
       <UButton v-if="cancelable" color="error" variant="solid" block icon="i-lucide-x" @click="onCancelOrder">
         {{ $t('orderCard.cancelOrder') }}
       </UButton>
     </template>
-
   </UCard>
+  <UModal v-model:open="reviewModal">
+    <template #content>
+      <ReviewOrderForm :order-id="order.value.id" :onCancel="() => (reviewModal = false)" />
+    </template>
+  </UModal>
 </template>

@@ -120,9 +120,8 @@ const confirmOrder = async (_event: FormSubmitEvent<CustomerInfo>) => {
                 </template>
 
                 <!-- Items -->
-                <div class="divide-y divide-default">
-                    <OrderedFoodItemsList :order-items="cartItems" />
-                </div>
+
+                <OrderedFoodItemsList :order-items="cartItems" />
 
                 <template #footer>
                     <div class="space-y-1">
@@ -140,7 +139,7 @@ const confirmOrder = async (_event: FormSubmitEvent<CustomerInfo>) => {
             <!-- ── Customer Info Form ── -->
             <UForm :state="state" :validate="validate" :validate-on="['change', 'blur']" class="space-y-5"
                 @submit="confirmOrder">
-                <UCard :ui="{ body: 'p-6 space-y-4',}">
+                <UCard :ui="{ body: 'p-6 space-y-4', }">
                     <template #header>
                         <p class="text-xl font-bold">{{ $t('customerInfo.title') }}</p>
                     </template>

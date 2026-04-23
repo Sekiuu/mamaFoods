@@ -40,20 +40,17 @@ onUnmounted(() => {
     <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-4xl mx-auto">
             <div class="mb-10 flex items-center justify-between gap-4">
-                <NuxtLink to="/shop"
-                    class="rounded-2xl bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300 transition">Back to orders
-                </NuxtLink>
+                <UButton to="/shop" color="neutral" variant="subtle" icon="i-lucide-arrow-left">Back to orders
+                </UButton>
             </div>
 
-            <UAlert v-if="loading" class="flex justify-center py-20">
-                <UIcon name="i-heroicons-loading" class="animate-spin" />
-            </UAlert>
+            <USkeleton v-if="loading" class="flex justify-center py-20" v-for="i in 4" :key="i" />
 
             <div v-else-if="order">
                 <OrderCard :cancelable="true" :order="ref(order)" />
             </div>
 
-            <div v-else class="rounded-3xl bg-white p-10 shadow-sm border border-gray-100 text-center">
+            <div v-else class="rounded-3xlp-10 shadow-sm border text-center">
                 <p class="text-gray-500">Order not found.</p>
             </div>
         </div>

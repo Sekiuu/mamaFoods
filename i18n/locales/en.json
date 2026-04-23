@@ -126,7 +126,20 @@
         "reportProblem": "Report Problem",
         "confirmReceipt": "Confirm Receipt",
         "completeOrderThankyou": "Thank you for your order",
-        "confirmReceiptDesc": "Have you received all items? If yes, please confirm receipt."
+        "confirmReceiptDesc": "Have you received all items? If yes, please confirm receipt.",
+        "writeReview": "Write Review"
+    },
+    "review": {
+        "title": "Review",
+        "submit": "Submit Review",
+        "rating": "Rating",
+        "comment": "Comment",
+        "success": "Thank you for your review!",
+        "error": "Failed to submit review. Please try again.",
+        "commentPlaceholder": "How was your experience? We would love to hear your feedback!",
+        "validation": {
+            "rating": "Please select a rating"
+        }
     },
     "order": {
         "title": "Order",
@@ -243,5 +256,12 @@
         "ok": "OK",
         "error": "Error",
         "permission-denied": "Permission Denied"
+    },
+    "role": {
+        "roles": "Roles",
+        "all": "All",
+        "admin": "Admin",
+        "operator": "Operator",
+        "customer": "Customer"
     }
 }
