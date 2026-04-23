@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { OrderStatus, type Order, PaymentStatus } from '#shared/types/orders'
 import { useOrderManagement } from '~/composables/useOrderManagement'
+import type { FoodOrderItem, OldFoodOrderItem } from '~~/shared/types/foods'
 
 interface Props {
     orders: Order[]
     onStatusUpdate: (id: number, status: string) => void
     detailLink?: string
 }
-const props = defineProps<Props>()
+const props = defineProps<Props>() 
 const { formatDate } = useOrderManagement()
 const { t } = useI18n()
-if (!props.detailLink?.endsWith('/')){
+if (!props.detailLink?.endsWith('/')) {
     console.error('detailLink should end with /')
 }
 
@@ -19,6 +20,25 @@ const updatingOrder = ref({ id: -1, isUpdating: false })
 
 // Per-order modal state — keyed by order id
 const forceCompleteOpenMap = ref<Record<number, boolean>>({})
+
+/**
+ * Safely parses the stringified items and normalizes fields
+ */
+const parseItems = (itemsStr: string) => {
+    try {
+        const parsed = JSON.parse(itemsStr)
+        if (!Array.isArray(parsed)) return []
+        // Normalize both old and new item formats to CartItem shape
+        return parsed.map((i: FoodOrderItem | OldFoodOrderItem | any) => ({
+            food_id: i.food_id ?? i.id,
+            food_name: i.food_name ?? i.name,
+            quantity: i.quantity ?? i.quantity
+        }))
+    } catch (e) {
+        console.error('Failed to parse items:', e)
+        return []
+    }
+}
 
 const openForceComplete = (id: number) => forceCompleteOpenMap.value[id] = true
 const closeForceComplete = (id: number) => forceCompleteOpenMap.value[id] = false
@@ -96,13 +116,13 @@ const getActions = (status: string, isPaid: boolean = false) => [
 </script>
 
 <template>
-    <UCard class="space-y-3">
+    <UCard variant="soft" :ui="{ body: 'space-y-6' }">
         <template #header>
             <UContainer class="flex justify-between">
                 <h1 class="text-3xl"> {{ $t('order.title') }} </h1>
             </UContainer>
         </template>
-        <UCard v-for="order in orders" :key="order.id" variant="outline">
+        <UCard v-for="order in orders" :key="order.id" variant="subtle">
 
             <!-- Header: Order ID + Status -->
             <template #header>
@@ -117,24 +137,35 @@ const getActions = (status: string, isPaid: boolean = false) => [
             </template>
 
             <!-- Body: Customer info -->
-            <div class="grid sm:grid-cols-2 gap-1 text-sm text-muted">
-                <p class="flex items-center gap-1.5">
-                    <UIcon name="i-lucide-user" class="size-4 shrink-0" />
-                    {{ order.customer_name }}
-                </p>
-                <p class="flex items-center gap-1.5">
-                    <UIcon name="i-lucide-phone" class="size-4 shrink-0" />
-                    {{ order.customer_phone }}
-                </p>
-                <p class="flex items-center gap-1.5">
-                    <UIcon name="i-lucide-map-pin" class="size-4 shrink-0" />
-                    {{ order.customer_address }}
-                </p>
-                <p class="flex items-center gap-1.5">
-                    <UIcon name="i-lucide-banknote" class="size-4 shrink-0" />
-                    ฿{{ order.total_price }}
-                </p>
-            </div>
+            <template #default>
+                <div class="grid sm:grid-cols-2 gap-1 text-sm text-muted">
+                    <p class="flex items-center gap-1.5">
+                        <UIcon name="i-lucide-user" class="size-4 shrink-0" />
+                        {{ order.customer_name }}
+                    </p>
+                    <p class="flex items-center gap-1.5">
+                        <UIcon name="i-lucide-phone" class="size-4 shrink-0" />
+                        {{ order.customer_phone }}
+                    </p>
+                    <p class="flex items-center gap-1.5">
+                        <UIcon name="i-lucide-map-pin" class="size-4 shrink-0" />
+                        {{ order.customer_address }}
+                    </p>
+                    <p class="flex items-center gap-1.5">
+                        <UIcon name="i-lucide-banknote" class="size-4 shrink-0" />
+                        ฿{{ order.total_price }}
+                    </p>
+                </div>
+                <div>
+                    <p class="text-sm text-muted mb-1">{{ $t('order.items') }}</p>
+                    <ul class="list-disc list-inside text-sm">
+                        <li v-for="item in parseItems(order.items)" :key="item.food_id">
+                            {{ item.food_name }} x {{ item.quantity }}
+                        </li>
+                    </ul>
+                </div>
+            </template>
+
 
             <!-- Footer: Action buttons -->
             <template #footer>

@@ -6,9 +6,8 @@ import type { Select } from '@prisma/client/runtime/client';
 import type { SelectItem } from '@nuxt/ui';
 const props = defineProps<{
     orderId: number
-    onCancel?: () => void
-    onSubmit?: (data: ReviewData) => void
 }>()
+const emit = defineEmits(['cancel', 'submit'])
 
 const schema = v.object({
     rating: v.pipe(v.number(), v.maxValue(5), v.minValue(1, $t('review.validation.rating'))),
@@ -47,11 +46,11 @@ const submitReview = async () => {
         // You can add any cleanup code here if needed
         cancelReview()
     }
-    props.onSubmit?.(payload)
+    emit('submit', payload)
 }
 
 const cancelReview = () => {
-    props.onCancel?.()
+    emit('cancel')
     console.log('Review cancelled')
 }
 

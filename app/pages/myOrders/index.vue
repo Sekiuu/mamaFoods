@@ -83,21 +83,46 @@ onMounted(() => {
 </script>
 
 <template>
-    <UPage class="min-h-screen max-w-6xl mx-auto">
-        <UPageHeader :title="$t('myOrders.title')" :description="$t('myOrders.subtitle')" />
+    <UPage class="min-h-screen md:max-w-6xl max-w-xs mx-auto">
+        <UPageHeader
+            :title="$t('myOrders.title')"
+            :description="$t('myOrders.subtitle')"
+            icon="i-lucide-shopping-bag"
+            :ui="{ title: 'text-2xl font-bold text-center w-full', description: 'text-muted text-center' }"
+        />
 
         <UPageBody>
             <!-- Loading state -->
-            <div v-if="loading" class="flex justify-center py-20">
+            <div v-if="loading" class="flex flex-col gap-3 py-20">
                 <USkeleton class="h-12 w-full" v-for="i in 4" :key="i" />
             </div>
 
             <template v-else>
-                <!-- Filter tabs -->
-                <UTabs v-model="activeTab" :items="tabs" color="neutral" variant="pill" class="mb-6" />
+                <!-- Mobile: Select dropdown -->
+                <USelect
+                    v-model="activeTab"
+                    :items="tabs"
+                    value-key="value"
+                    label-key="label"
+                    class="mb-4 sm:hidden w-full"
+                />
+
+                <!-- Desktop: Full tabs -->
+                <UTabs
+                    v-model="activeTab"
+                    :items="tabs"
+                    :content="false"
+                    color="neutral"
+                    variant="pill"
+                    class="mb-6 hidden sm:flex"
+                />
 
                 <!-- Orders list -->
-                <OrderList :orders="orders" :format-date="formatDate" :filter-status="filterStatus" />
+                <OrderList
+                    :orders="orders"
+                    :format-date="formatDate"
+                    :filter-status="filterStatus"
+                />
             </template>
         </UPageBody>
     </UPage>

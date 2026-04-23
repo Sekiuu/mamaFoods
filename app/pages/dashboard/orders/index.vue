@@ -19,12 +19,24 @@ const globalFilter = ref('')
 const filterStatus = ref<Array<OrderStatus | PaymentStatus>>([])
 const activeOrders = computed(() => {
     if (!orders.value) return []
-    if (filterStatus.value.length === 0) return orders.value
-    return orders.value.filter(o =>
-        (filterStatus.value.includes(o.status) || filterStatus.value.includes(o.payment_status)) &&
-        o.customer_name.toLowerCase().includes(globalFilter.value.toLowerCase()))
-}
-)
+    let filtered = orders.value
+    if (globalFilter.value) {
+        const keyword = globalFilter.value.toLowerCase()
+        filtered = filtered.filter(o =>
+            String(o.id).includes(keyword) ||
+            String(o.total_price).includes(keyword) ||
+            o.items.includes(keyword) ||
+            o.customer_name.toLowerCase().includes(keyword)
+        )
+    }
+    if (filterStatus.value.length > 0) {
+        filtered = filtered.filter(o =>
+            filterStatus.value.includes(o.status) ||
+            filterStatus.value.includes(o.payment_status)
+        )
+    }
+    return filtered
+})
 
 const filterOptions: Array<SelectMenuItem> = [
     { label: t('order.status.title'), type: 'label' },
@@ -89,7 +101,7 @@ onMounted(async () => {
 
 <template>
     <AdminHeader :title="$t('admin.header.order')" :enable-back="true" />
-    <UCard class="min-h-screen max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <UCard class="min-h-screen max-w-7xl mx-auto py-6 sm:px-6 lg:px-8" >
 
         <!-- Notifications -->
         <template #header>
@@ -104,8 +116,8 @@ onMounted(async () => {
                     :placeholder="$t('admin.crud.search')" class="w-64 my-auto" />
                 <!-- Filter combobox dropdown with checkboxes -->
                 <USelectMenu v-model="filterStatus" :items="filterOptions" value-key="value" multiple
-                    :placeholder="$t('order.status.title')" leading-icon="i-lucide-filter" :clear="filterStatus.length > 0"
-                    class="w-full sm:w-56">
+                    :placeholder="$t('order.status.title')" leading-icon="i-lucide-filter"
+                    :clear="filterStatus.length > 0" class="w-full sm:w-56">
                     <!-- Trigger label: show count badge when filters active -->
                     <template #default>
                         <span v-if="filterStatus.length === 0" class="text-muted">{{ $t('admin.crud.search') }}</span>
@@ -118,8 +130,8 @@ onMounted(async () => {
             </div>
         </template>
         <!-- Order Manager Tab -->
-        <OrderManager v-if="activeTab === TabsRepresents.manager" detail-link="orders/" :orders="activeOrders as Order[]"
-            :on-status-update="handleStatusUpdate" />
+        <OrderManager v-if="activeTab === TabsRepresents.manager" detail-link="orders/"
+            :orders="activeOrders as Order[]" :on-status-update="handleStatusUpdate" />
 
 
         <!-- CRUD Operations Tab -->

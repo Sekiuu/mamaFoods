@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { CartItem, FoodItem, FoodOption, FoodOptionChoice } from '#shared/types/foods';
+import type { FoodOrderItem, FoodItem, FoodOption, FoodOptionChoice } from '#shared/types/foods';
 import type { RadioGroupItem, RadioGroupValue } from '@nuxt/ui';
 
 const { t } = useI18n()
 
 const props = defineProps<{
     item: FoodItem
-    addToCart?: (item: CartItem) => void
+    addToCart?: (item: FoodOrderItem) => void
 }>()
 
 const isModalOpen = ref(false)

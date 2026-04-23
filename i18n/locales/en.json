@@ -143,6 +143,7 @@
     },
     "order": {
         "title": "Order",
+        "items": "Food Items",
         "status": {
             "title": "Order Status",
             "pending": "Pending",

@@ -11,13 +11,13 @@
 </template>
 
 <script setup lang="ts">
-import type { CartItem, FoodItem } from '#shared/types/foods'
+import type { FoodOrderItem, FoodItem } from '#shared/types/foods'
 
 const DEFAULT_COLS = 3
 
 const props = defineProps<{
     foods: FoodItem[]
-    addToCart?: (item: CartItem) => void
+    addToCart?: (item: FoodOrderItem) => void
     gridCols?: number
     title?: string
 }>()

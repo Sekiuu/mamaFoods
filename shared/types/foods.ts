@@ -1,9 +1,19 @@
-export interface CartItem {
+export interface FoodOrderItem {
   food_id: number
   food_name?: string | null
   food_discription?: string | null
   food_price: number 
   food_icon: string
+  options?: FoodOptionChoice[] | null
+  quantity: number
+  total_price: number
+}
+export interface OldFoodOrderItem {
+  id: number
+  name?: string | null
+  description?: string | null
+  price: number
+  icon: string
   options?: FoodOptionChoice[] | null
   quantity: number
   total_price: number

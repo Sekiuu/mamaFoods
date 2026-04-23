@@ -296,7 +296,7 @@ watch(orderStatus, (newValue) => {
   </UCard>
   <UModal v-model:open="reviewModal">
     <template #content>
-      <ReviewOrderForm :order-id="order.value.id" :onCancel="() => (reviewModal = false)" :onSubmit="onCompleteReview"/>
+      <ReviewOrderForm :order-id="order.value.id" @cancel="reviewModal = false" @submit="onCompleteReview"/>
     </template>
   </UModal>
 </template>

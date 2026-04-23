@@ -1,4 +1,4 @@
-import type { CartItem } from './foods'
+import type { FoodOrderItem } from './foods'
 
 export interface CustomerInfo {
     name: string
@@ -33,5 +33,5 @@ export enum PaymentStatus {
     Paid = "paid",
 }
 export interface OrderWithParsedItems extends Order {
-    parsedItems: CartItem[]
+    parsedItems: FoodOrderItem[]
 }
