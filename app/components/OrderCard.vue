@@ -12,6 +12,7 @@ const props = defineProps<{
   order: Ref<Order>
   cancelable: boolean
   editable?: boolean
+  onCompleteReview?: () => void
 }>()
 
 const isEditingMode = ref(false)
@@ -295,7 +296,7 @@ watch(orderStatus, (newValue) => {
   </UCard>
   <UModal v-model:open="reviewModal">
     <template #content>
-      <ReviewOrderForm :order-id="order.value.id" :onCancel="() => (reviewModal = false)" />
+      <ReviewOrderForm :order-id="order.value.id" :onCancel="() => (reviewModal = false)" :onSubmit="onCompleteReview"/>
     </template>
   </UModal>
 </template>

@@ -229,7 +229,8 @@
         "save": "Save Changes",
         "view": "View Details",
         "copy": "Copy",
-        "paste": "Paste"
+        "paste": "Paste",
+        "back": "Back"
     },
     "tabs": {
         "manager": "Manager",

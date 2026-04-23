@@ -40,14 +40,13 @@ onUnmounted(() => {
     <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-4xl mx-auto">
             <div class="mb-10 flex items-center justify-between gap-4">
-                <UButton to="/shop" color="neutral" variant="subtle" icon="i-lucide-arrow-left">Back to orders
-                </UButton>
+                <UButton to="/shop" color="neutral" variant="subtle" icon="i-lucide-arrow-left" :label="$t('btn.back')" />
             </div>
 
             <USkeleton v-if="loading" class="flex justify-center py-20" v-for="i in 4" :key="i" />
 
             <div v-else-if="order">
-                <OrderCard :cancelable="true" :order="ref(order)" />
+                <OrderCard :cancelable="true" :order="ref(order)" :onCompleteReview="() => navigateTo('/shop')" />
             </div>
 
             <div v-else class="rounded-3xlp-10 shadow-sm border text-center">
