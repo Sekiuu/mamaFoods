@@ -166,7 +166,7 @@ const getActions = (status: string, isPaid: boolean = false) => [
                                 <div class="flex justify-end gap-2">
                                     <UButton :label="$t('btn.cancel')" color="neutral" variant="outline"
                                         @click="closeForceComplete(order.id)" />
-                                    <UButton :label="$t('btn.confirm')" color="success" icon="i-lucide-check"
+                                    <UButton :label="$t('btn.confirm')" color="warning" icon="i-lucide-check"
                                         @click="handleStatusUpdate(order.id, OrderStatus.Completed); closeForceComplete(order.id)" />
                                 </div>
                             </template>

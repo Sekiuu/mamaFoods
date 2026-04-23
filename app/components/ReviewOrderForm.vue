@@ -20,7 +20,7 @@ const formData = reactive({
 
 const { session } = useUserSession()
 const toast = useToast()
-const submitReview = () => {
+const submitReview = async () => {
     const payload = {
         reviewer_role: formData.reviewer_role,
         order_id: props.orderId,
@@ -29,7 +29,7 @@ const submitReview = () => {
     } as ReviewData
     console.log(payload)
     try {
-        $fetch('/api/reviews', {
+        await $fetch('/api/reviews', {
             method: 'POST',
             body: payload,
         })
@@ -38,10 +38,12 @@ const submitReview = () => {
             color: 'success',
             icon: 'i-lucide-check-circle',
         })
-        cancelReview()
     } catch (err) {
         console.error('Validation failed:', err)
         return
+    } finally {
+        // You can add any cleanup code here if needed
+        cancelReview()
     }
     props.onSubmit?.(payload)
 }
