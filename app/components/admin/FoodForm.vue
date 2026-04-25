@@ -121,7 +121,7 @@ const pasteOptions = () => {
     const parsed = JSON.parse(saved)
     formData.value.options = [...(formData.value.options || []), ...parsed]
     toast.add({ title: 'Options pasted!', color: 'success', icon: 'i-lucide-clipboard-check' })
-  } catch {}
+  } catch { }
 }
 
 const addOption = () => {
@@ -130,7 +130,43 @@ const addOption = () => {
 }
 
 const addChoice = (option: FoodOption) => {
-  ;(option.choices as FoodOptionChoice[]).push({ name: '', price: 0, default: false })
+  ; (option.choices as FoodOptionChoice[]).push({ name: '', price: 0, default: false })
+}
+
+const currentImage = ref(null as File | null)
+const isUploadingImage = ref(false)
+const uploadImage = async (file: File) => {
+  if (!file) return
+  console.log('Uploading image:', file.name, file.size, file.type);
+  isUploadingImage.value = true
+  try {
+    const body = new FormData()
+    body.append('file', file)
+
+    const response = await fetch('/api/foods/images', {
+      method: 'POST',
+      body: body,
+    })
+    const data = await response.json()
+    formData.value.icon = data.url // Set the icon to the new image URL
+
+    // Clear the current image
+    currentImage.value = null
+    // Show success toast
+    toast.add({ title: 'Image uploaded!', color: 'success', icon: 'i-lucide-check' })
+    // update data base of food
+    await submitForm()
+  } catch (error : any) {
+    console.error('Error uploading image:', error);
+    toast.add({
+      title: 'Image upload failed', color: 'error', icon: 'i-lucide-x',
+      description: error.message || 'An error occurred while uploading the image.'
+    })
+    return ''
+  }
+  finally {
+    isUploadingImage.value = false
+  }
 }
 
 onMounted(() => {
@@ -150,12 +186,10 @@ watch(
     <!-- Header -->
     <template #header>
       <div class="flex items-center gap-3">
-        <div class="p-2 rounded-xl" :class="isEditing ? 'bg-warning-100 dark:bg-warning-900' : 'bg-primary-100 dark:bg-primary-900'">
-          <UIcon
-            :name="isEditing ? 'i-lucide-pencil' : 'i-lucide-utensils'"
-            class="size-5"
-            :class="isEditing ? 'text-warning-600' : 'text-primary-600'"
-          />
+        <div class="p-2 rounded-xl"
+          :class="isEditing ? 'bg-warning-100 dark:bg-warning-900' : 'bg-primary-100 dark:bg-primary-900'">
+          <UIcon :name="isEditing ? 'i-lucide-pencil' : 'i-lucide-utensils'" class="size-5"
+            :class="isEditing ? 'text-warning-600' : 'text-primary-600'" />
         </div>
         <div>
           <h2 class="text-lg font-bold leading-tight">
@@ -165,15 +199,8 @@ watch(
             {{ isEditing ? `Editing: ${props.editingFood?.name}` : 'Fill in the details below' }}
           </p>
         </div>
-        <UButton
-          v-if="isEditing"
-          icon="i-lucide-x"
-          size="xs"
-          color="neutral"
-          variant="ghost"
-          class="ml-auto"
-          @click="resetForm"
-        />
+        <UButton v-if="isEditing" icon="i-lucide-x" size="xs" color="neutral" variant="ghost" class="ml-auto"
+          @click="resetForm" />
       </div>
     </template>
 
@@ -187,56 +214,42 @@ watch(
 
         <!-- Image Preview + Icon Input -->
         <div class="flex gap-4 items-start">
-          <div class="shrink-0 size-20 rounded-2xl overflow-hidden bg-neutral-100 dark:bg-neutral-800 border border-default flex items-center justify-center">
-            <img
-              v-if="formData.icon"
-              :src="formData.icon"
-              :alt="formData.name"
-              class="object-cover w-full h-full"
-              @error="(e) => (e.target as HTMLImageElement).style.display = 'none'"
-            />
-            <UIcon v-else name="i-lucide-image" class="size-8 text-muted" />
+
+          <div v-if="!currentImage"
+            class="shrink-0 size-24 rounded-2xl overflow-hidden bg-neutral-100 dark:bg-neutral-800 border border-default flex items-center justify-center">
+            <img v-if="formData.icon" :src="formData.icon" :alt="formData.name" class="object-cover w-full h-full"
+              @error="(e) => (e.target as HTMLImageElement).style.display = 'none'" />
+            <UIcon v-else name="i-lucide-image" class="size-8 text-muted content-center" />
+
           </div>
-          <UFormField :label="$t('admin.food.icon')" name="icon" class="flex-1">
-            <UInput
-              v-model="formData.icon"
-              :placeholder="$t('admin.food.icon')"
-              icon="i-lucide-link"
-              class="w-full"
-            />
+          <UFileUpload v-model="currentImage" accept="image/*" :disabled="isUploadingImage" class="aspect-square" />
+          <UFormField name="icon">
+            <UInput v-model="formData.icon" :placeholder="$t('admin.food.icon')" icon="i-lucide-link" class="w-full"
+              :disabled="isUploadingImage" />
+
+            <UButton v-if="currentImage" icon="i-lucide-upload" :label="$t('btn.upload.image')" color="primary"
+              variant="outline" class="mt-2" @click="uploadImage(currentImage)" :loading="isUploadingImage" />
           </UFormField>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <UFormField :label="$t('admin.food.name')" name="name" required class="col-span-2 sm:col-span-1">
-            <UInput
-              v-model="formData.name"
-              :placeholder="$t('admin.food.name')"
-              icon="i-lucide-utensils"
-              class="w-full"
-            />
+            <UInput v-model="formData.name" :placeholder="$t('admin.food.name')" icon="i-lucide-utensils"
+              class="w-full" />
           </UFormField>
           <UFormField :label="$t('food.price')" name="price" required class="col-span-2 sm:col-span-1">
-            <UInput
-              v-model="formData.price"
-              :placeholder="$t('food.price')"
-              icon="i-lucide-banknote"
-              class="w-full"
-            />
+            <UInput v-model="formData.price" :placeholder="$t('food.price')" icon="i-lucide-banknote" class="w-full" />
           </UFormField>
         </div>
 
         <UFormField :label="$t('admin.food.description')" name="description">
-          <UTextarea
-            v-model="formData.description"
-            :placeholder="$t('admin.food.description')"
-            :rows="3"
-            class="w-full"
-          />
+          <UTextarea v-model="formData.description" :placeholder="$t('admin.food.description')" :rows="3"
+            class="w-full" />
         </UFormField>
 
         <!-- Visibility Toggle -->
-        <div class="flex items-center justify-between p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-default">
+        <div
+          class="flex items-center justify-between p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-default">
           <div class="flex items-center gap-2">
             <UIcon name="i-lucide-eye" class="size-4 text-muted" />
             <div>
@@ -255,42 +268,23 @@ watch(
         <div class="flex items-center justify-between">
           <p class="text-xs font-semibold uppercase tracking-widest text-muted flex items-center gap-2">
             <UIcon name="i-lucide-sliders-horizontal" class="size-3.5" /> Options
-            <UBadge
-              v-if="formData.options?.length"
-              :label="String(formData.options.length)"
-              color="primary"
-              variant="subtle"
-              size="sm"
-            />
+            <UBadge v-if="formData.options?.length" :label="String(formData.options.length)" color="primary"
+              variant="subtle" size="sm" />
           </p>
           <div class="flex gap-1.5">
             <UTooltip text="Copy options">
-              <UButton
-                icon="i-lucide-copy"
-                size="xs"
-                color="neutral"
-                variant="outline"
-                :disabled="!formData.options?.length"
-                @click="copyOptions"
-              />
+              <UButton icon="i-lucide-copy" size="xs" color="neutral" variant="outline"
+                :disabled="!formData.options?.length" @click="copyOptions" />
             </UTooltip>
             <UTooltip text="Paste options">
-              <UButton
-                icon="i-lucide-clipboard"
-                size="xs"
-                color="neutral"
-                variant="outline"
-                @click="pasteOptions"
-              />
+              <UButton icon="i-lucide-clipboard" size="xs" color="neutral" variant="outline" @click="pasteOptions" />
             </UTooltip>
           </div>
         </div>
 
         <!-- Empty State -->
-        <div
-          v-if="!formData.options?.length"
-          class="border-2 border-dashed border-default rounded-2xl p-8 text-center space-y-2"
-        >
+        <div v-if="!formData.options?.length"
+          class="border-2 border-dashed border-default rounded-2xl p-8 text-center space-y-2">
           <UIcon name="i-lucide-list-plus" class="size-8 text-muted mx-auto" />
           <p class="text-sm text-muted">{{ $t('admin.food.noOptions') }}</p>
           <UButton size="sm" variant="soft" color="primary" icon="i-lucide-plus" @click="addOption">
@@ -300,11 +294,8 @@ watch(
 
         <!-- Option Cards -->
         <div v-else class="space-y-3">
-          <UCard
-            v-for="(option, index) in formData.options"
-            :key="index"
-            :ui="{ root: 'border-l-4 border-l-primary-400', body: 'p-4 space-y-4' }"
-          >
+          <UCard v-for="(option, index) in formData.options" :key="index"
+            :ui="{ root: 'border-l-4 border-l-primary-400', body: 'p-4 space-y-4' }">
             <!-- Option Header -->
             <div class="flex items-start gap-3">
               <div class="flex-1 grid grid-cols-2 gap-3">
@@ -312,30 +303,20 @@ watch(
                   <UInput v-model="option.name" :placeholder="$t('admin.food.optionName')" size="sm" class="w-full" />
                 </UFormField>
                 <UFormField :label="$t('admin.food.optionType') || 'Type'">
-                  <USelect
-                    v-model="option.type"
-                    size="sm"
-                    :items="[
-                      { label: 'Single choice', value: 'single' },
-                      { label: 'Multiple choice', value: 'multiple' },
-                    ]"
-                    class="w-full"
-                  />
+                  <USelect v-model="option.type" size="sm" :items="[
+                    { label: 'Single choice', value: 'single' },
+                    { label: 'Multiple choice', value: 'multiple' },
+                  ]" class="w-full" />
                 </UFormField>
               </div>
-              <UButton
-                icon="i-lucide-trash-2"
-                color="error"
-                variant="ghost"
-                size="sm"
-                class="mt-6 shrink-0"
-                @click="formData.options?.splice(index, 1)"
-              />
+              <UButton icon="i-lucide-trash-2" color="error" variant="ghost" size="sm" class="mt-6 shrink-0"
+                @click="formData.options?.splice(index, 1)" />
             </div>
 
             <div class="flex items-center gap-4">
               <UFormField :label="$t('admin.food.description')" class="flex-1">
-                <UInput v-model="option.description" :placeholder="$t('admin.food.description')" size="sm" class="w-full" />
+                <UInput v-model="option.description" :placeholder="$t('admin.food.description')" size="sm"
+                  class="w-full" />
               </UFormField>
               <div class="flex items-center gap-2 pt-5">
                 <UCheckbox v-model="option.required" size="sm" :label="$t('admin.food.required') || 'Required'" />
@@ -349,114 +330,57 @@ watch(
                   {{ $t('admin.food.choices') }}
                   <span class="ml-1 text-primary-500">({{ (option.choices as FoodOptionChoice[]).length }})</span>
                 </p>
-                <UButton
-                  icon="i-lucide-plus"
-                  size="xs"
-                  variant="soft"
-                  color="primary"
-                  @click="addChoice(option)"
-                >
+                <UButton icon="i-lucide-plus" size="xs" variant="soft" color="primary" @click="addChoice(option)">
                   {{ $t('admin.food.addChoice') }}
                 </UButton>
               </div>
 
-              <div v-if="!(option.choices as FoodOptionChoice[]).length" class="text-center py-3 text-xs text-muted italic">
+              <div v-if="!(option.choices as FoodOptionChoice[]).length"
+                class="text-center py-3 text-xs text-muted italic">
                 {{ $t('admin.food.noChoices') }}
               </div>
 
-              <div
-                v-for="(choice, cIndex) in (option.choices as FoodOptionChoice[])"
-                :key="cIndex"
-                class="flex items-center gap-2 p-2 rounded-lg bg-white dark:bg-neutral-800 border border-default"
-              >
+              <div v-for="(choice, cIndex) in (option.choices as FoodOptionChoice[])" :key="cIndex"
+                class="flex items-center gap-2 p-2 rounded-lg bg-white dark:bg-neutral-800 border border-default">
                 <div class="flex-1 grid grid-cols-2 gap-2">
-                  <UInput
-                    v-model="choice.name"
-                    :placeholder="$t('admin.food.choiceName')"
-                    size="xs"
-                  />
-                  <UInput
-                    v-model="choice.price"
-                    type="number"
-                    placeholder="฿ Price"
-                    size="xs"
-                    icon="i-lucide-plus-circle"
-                  />
+                  <UInput v-model="choice.name" :placeholder="$t('admin.food.choiceName')" size="xs" />
+                  <UInput v-model="choice.price" type="number" placeholder="฿ Price" size="xs"
+                    icon="i-lucide-plus-circle" />
                 </div>
                 <UTooltip :text="$t('admin.food.setOptionDefault')">
-                  <UCheckbox
-                    v-model="choice.default"
-                    @update:model-value="(val : any) => {
-                      if (val && option.type === 'single') {
-                        (option.choices as FoodOptionChoice[]).forEach((c, i) => {
-                          if (i !== cIndex) c.default = false
-                        })
-                      }
-                    }"
-                  />
+                  <UCheckbox v-model="choice.default" @update:model-value="(val: any) => {
+                    if (val && option.type === 'single') {
+                      (option.choices as FoodOptionChoice[]).forEach((c, i) => {
+                        if (i !== cIndex) c.default = false
+                      })
+                    }
+                  }" />
                 </UTooltip>
-                <UButton
-                  icon="i-lucide-x"
-                  color="error"
-                  variant="ghost"
-                  size="xs"
-                  @click="(option.choices as FoodOptionChoice[]).splice(cIndex, 1)"
-                />
+                <UButton icon="i-lucide-x" color="error" variant="ghost" size="xs"
+                  @click="(option.choices as FoodOptionChoice[]).splice(cIndex, 1)" />
               </div>
             </div>
           </UCard>
 
-          <UButton
-            type="button"
-            color="primary"
-            variant="soft"
-            icon="i-lucide-plus"
-            block
-            @click="addOption"
-          >
+          <UButton type="button" color="primary" variant="soft" icon="i-lucide-plus" block @click="addOption">
             {{ $t('admin.food.addOption') }}
           </UButton>
         </div>
       </div>
 
       <!-- ── Alerts ── -->
-      <UAlert
-        v-if="errorMessage"
-        color="error"
-        variant="soft"
-        icon="i-lucide-circle-x"
-        :description="errorMessage"
-        close
-        @update:open="errorMessage = ''"
-      />
-      <UAlert
-        v-if="successMessage"
-        color="success"
-        variant="soft"
-        icon="i-lucide-circle-check"
-        :description="successMessage"
-        close
-        @update:open="successMessage = ''"
-      />
+      <UAlert v-if="errorMessage" color="error" variant="soft" icon="i-lucide-circle-x" :description="errorMessage"
+        close @update:open="errorMessage = ''" />
+      <UAlert v-if="successMessage" color="success" variant="soft" icon="i-lucide-circle-check"
+        :description="successMessage" close @update:open="successMessage = ''" />
 
       <!-- ── Submit Actions ── -->
       <div class="flex items-center gap-3 pt-2">
-        <UButton
-          type="submit"
-          :color="isEditing ? 'warning' : 'success'"
-          :icon="isEditing ? 'i-lucide-save' : 'i-lucide-plus-circle'"
-          :loading="isLoading"
-          class="flex-1"
-        >
+        <UButton type="submit" :color="isEditing ? 'warning' : 'success'"
+          :icon="isEditing ? 'i-lucide-save' : 'i-lucide-plus-circle'" :loading="isLoading" class="flex-1">
           {{ isEditing ? $t('admin.food.updateBtn') : $t('admin.food.createBtn') }}
         </UButton>
-        <UButton
-          type="button"
-          color="neutral"
-          variant="soft"
-          icon="i-lucide-rotate-ccw"
-          @click="resetForm"
-        >
+        <UButton type="button" color="neutral" variant="soft" icon="i-lucide-rotate-ccw" @click="resetForm">
           {{ $t('admin.food.clearBtn') }}
         </UButton>
       </div>

@@ -1,31 +1,10 @@
-import { google } from 'googleapis'
 import path from 'path'
 import fs from 'fs'
+import { useGoogleDrive } from '~~/server/utils/drive'
 
+const drive = useGoogleDrive()
 export default defineEventHandler(async (event) => {
   const fileId = getRouterParam(event, 'id')
-  const config = useRuntimeConfig(event)
-
-  // ดึง JSON String จาก Env และแปลงกลับเป็น Object
-  const googleServiceAccountJson = config.googleServiceAccountJson.trim()
-  if (!googleServiceAccountJson || googleServiceAccountJson.length === 0) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Missing googleServiceAccountJson in .env file'
-    })
-  }
-  const serviceAccount = JSON.parse(googleServiceAccountJson)
-
-  const auth = new google.auth.GoogleAuth({
-    // เปลี่ยนจาก keyFile เป็น credentials
-    credentials: {
-      client_email: serviceAccount.client_email,
-      private_key: serviceAccount.private_key.replace(/\\n/g, '\n'), // สำคัญ: จัดการเรื่องขึ้นบรรทัดใหม่
-    },
-    scopes: ['https://www.googleapis.com/auth/drive.readonly'],
-  })
-
-  const drive = google.drive({ version: 'v3', auth })
   try {
     // 1. ลองดึงข้อมูลไฟล์ก่อนเพื่อดูว่ามีตัวตนและดึง Metadata ได้ไหม
     const fileMetadata = await drive.files.get({

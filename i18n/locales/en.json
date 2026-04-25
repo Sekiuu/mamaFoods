@@ -231,7 +231,10 @@
         "view": "View Details",
         "copy": "Copy",
         "paste": "Paste",
-        "back": "Back"
+        "back": "Back",
+        "upload": {
+            "image": "Upload Image"
+        }
     },
     "tabs": {
         "manager": "Manager",

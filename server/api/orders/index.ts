@@ -1,6 +1,5 @@
-import { getPrismaClient } from '../../utils/prisma'
 import { getQuery, readBody } from 'h3'
-
+import { getPrismaClient } from '../../utils/prisma'
 export type OrderResponse = {
   id: number
   customer_name: string | null

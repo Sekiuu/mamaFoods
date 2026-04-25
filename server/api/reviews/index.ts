@@ -1,3 +1,4 @@
+const prisma = getPrismaClient()
 export default defineEventHandler(async (event) => {
   if (event.req.method === 'POST') {
     try {
@@ -11,7 +12,6 @@ export default defineEventHandler(async (event) => {
         })
       }
 
-      const prisma = getPrismaClient()
       const review = await prisma.reviews.create({
         data: {
           rating,

@@ -1,5 +1,5 @@
-import { getPrismaClient } from '../../utils/prisma'
 import { FoodItem } from '#shared/types'
+import { getPrismaClient } from '../../utils/prisma'
 
 const prisma = getPrismaClient()
 

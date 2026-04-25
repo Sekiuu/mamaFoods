@@ -1,5 +1,4 @@
 import { hash } from '@node-rs/argon2'
-import { getPrismaClient } from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   const prisma = getPrismaClient()
