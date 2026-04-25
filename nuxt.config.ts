@@ -27,10 +27,12 @@ export default defineNuxtConfig({
     googleServiceAccountJson: process.env.GOOGLE_SERVICE_ACCOUNT_JSON || '',
 
     public: {
-      promptpayPhone: process.env.PROMPTPAY_PHONE
+      promptpayPhone: process.env.PROMPTPAY_PHONE,
+      cloudinary: {
+        cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+      }
     },
     cloudinary: {
-      cloudName: process.env.CLOUDINARY_CLOUD_NAME,
       apiKey: process.env.CLOUDINARY_API_KEY,
       apiSecret: process.env.CLOUDINARY_API_SECRET,
       folder:{
