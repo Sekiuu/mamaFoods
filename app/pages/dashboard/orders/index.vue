@@ -3,10 +3,9 @@ import { useOrderManagement } from '~/composables/useOrderManagement'
 import AdminHeader from '~/components/admin/AdminHeader.vue'
 import OrderManager from '~/components/admin/OrderManager.vue'
 import OrderCrud from '~/components/admin/OrderCrud.vue'
-import { type Order } from '#shared/types'
-import { Role } from '#shared/types/users'
 import type { TabsItem } from '@nuxt/ui'
-import { OrderStatus, PaymentStatus } from '#shared/types/orders'
+import type { Order } from '#shared/types/orders'
+import {OrderStatus, PaymentStatus } from '#shared/types/orders'
 import type { SelectMenuItem } from '@nuxt/ui'
 const { t } = useI18n()
 

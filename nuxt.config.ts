@@ -4,6 +4,10 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   modules: ['nuxt-auth-utils', "@nuxt/ui", '@nuxtjs/i18n', '@nuxtjs/cloudinary'],
+  cloudinary: {
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    apiKey: process.env.CLOUDINARY_API_KEY
+  },
   css: ['~/assets/css/main.css'],
   i18n: {
     locales: [
@@ -29,13 +33,13 @@ export default defineNuxtConfig({
     public: {
       promptpayPhone: process.env.PROMPTPAY_PHONE,
       cloudinary: {
-        cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+        cloudName: process.env.CLOUDINARY_CLOUD_NAME, // Kept for manual access if needed
       }
     },
     cloudinary: {
       apiKey: process.env.CLOUDINARY_API_KEY,
       apiSecret: process.env.CLOUDINARY_API_SECRET,
-      folder:{
+      folder: {
         foods: process.env.CLOUDINARY_FOLDER_FOODS
       }
     },

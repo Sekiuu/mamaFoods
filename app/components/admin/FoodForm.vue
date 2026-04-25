@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import * as v from 'valibot'
-import type { FoodItem } from '#shared/types'
 import { useDriveImage } from '~/composables/useDriveImage'
-import type { FoodOption, FoodOptionChoice } from '#shared/types/foods'
+import type { FoodOption, FoodOptionChoice, FoodItem } from '#shared/types/foods'
 
 const schema = v.object({
   name: v.pipe(v.string(), v.minLength(1, 'Food name is required.')),

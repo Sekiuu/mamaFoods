@@ -1,5 +1,2 @@
-export type { FoodOrderItem as CartItem, FoodItem } from './foods'
-export type { CustomerInfo, Order, OrderWithParsedItems } from './orders'
-export type { UserItem, Role } from './users'
-export type { ReviewData } from './reviews'
-export { roles } from './users'
+// Remove or comment out these lines to stop duplication warnings.
+// Nuxt will auto-import these types directly from their respective files.
