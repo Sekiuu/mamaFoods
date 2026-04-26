@@ -77,6 +77,7 @@ const submitForm = async () => {
   try {
     const iconUrl = await getImageURL(formData.value.icon.trim())
     formData.value.icon = iconUrl
+    await uploadImage()
 
     if (isEditing.value && props.editingFood?.id) {
       await $fetch(`/api/foods/${props.editingFood.id}`, {
@@ -134,7 +135,8 @@ const addChoice = (option: FoodOption) => {
 
 const currentImage = ref(null as File | null)
 const isUploadingImage = ref(false)
-const uploadImage = async (file: File) => {
+const uploadImage = async () => {
+  const file = currentImage.value
   if (!file) return
   console.log('Uploading image:', file.name, file.size, file.type);
   isUploadingImage.value = true
@@ -153,9 +155,7 @@ const uploadImage = async (file: File) => {
     currentImage.value = null
     // Show success toast
     toast.add({ title: 'Image uploaded!', color: 'success', icon: 'i-lucide-check' })
-    // update data base of food
-    await submitForm()
-  } catch (error : any) {
+  } catch (error: any) {
     console.error('Error uploading image:', error);
     toast.add({
       title: 'Image upload failed', color: 'error', icon: 'i-lucide-x',
@@ -227,7 +227,7 @@ watch(
               :disabled="isUploadingImage" />
 
             <UButton v-if="currentImage" icon="i-lucide-upload" :label="$t('btn.upload.image')" color="primary"
-              variant="outline" class="mt-2" @click="uploadImage(currentImage)" :loading="isUploadingImage" />
+              variant="outline" class="mt-2" :@click="uploadImage" :loading="isUploadingImage" />
           </UFormField>
         </div>
 
