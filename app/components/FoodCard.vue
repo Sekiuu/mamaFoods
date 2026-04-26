@@ -102,10 +102,10 @@ const handleConfirm = () => {
         <div class="h-48 relative overflow-hidden rounded-2xl">
             <img :src="props.item.icon ?? ''" :alt="props.item.name ?? ''" class="object-cover w-full h-full" />
             <!-- Price Tag -->
-            <div
-                class="absolute top-4 right-4 backdrop-blur px-3 py-1 rounded-full font-bold text-orange-600 shadow-sm">
+            <UBadge color="warning" size="xl" variant="soft"
+                class="absolute top-4 right-4 backdrop-blur px-3 py-1 rounded-full font-bold shadow-sm">
                 ฿{{ props.item.price }}
-            </div>
+            </UBadge>
         </div>
 
         <!-- Food Details -->

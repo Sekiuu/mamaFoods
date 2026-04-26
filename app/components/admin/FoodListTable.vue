@@ -1,7 +1,7 @@
 <template>
     <UCard>
         <template #header class="space-y-4">
-            <div class="flex items-center justify-between">
+            <div class="flex max-md:flex-col items-center justify-between">
                 <h2 class="text-2xl font-bold">Food Items</h2>
                 <UInput v-model="globalFilter" icon="i-lucide-search" placeholder="Search food items..." class="w-64" />
             </div>

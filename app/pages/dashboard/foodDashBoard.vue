@@ -2,7 +2,7 @@
     <AdminHeader :title="$t('admin.header.food')" :enable-back="true" />
 
     <UPage>
-        <UContainer color="neutral" variant="soft" class="p-4 max-w-7xl">
+        <UContainer color="neutral" variant="soft" class="px-4 max-w-7xl">
             <!-- Header -->
             <UPageHeader class="mb-4 gap-4">
                 <!-- Food Form Modal (no default slot trigger — controlled manually) -->

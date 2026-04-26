@@ -35,6 +35,7 @@
         "cart": {
             "title": "Shopping Cart",
             "empty": "Your cart is empty",
+            "emptyDesc": "You have no items in your cart. Order now and enjoy a delicious meal delivered to your doorstep!",
             "total": "Total",
             "checkout": "Checkout",
             "items": "Items",
