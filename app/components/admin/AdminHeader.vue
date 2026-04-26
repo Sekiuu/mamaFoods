@@ -23,7 +23,7 @@ const handleLogout = async () => {
 }
 </script>
 <template>
-  <UHeader to="#" :title="title">
+  <UPageHeader to="#" :title="title">
     <template #right>
       <slot name="actions" />
       <UButton v-if="enableBack" to="/dashboard" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md mr-4">
@@ -33,5 +33,5 @@ const handleLogout = async () => {
         {{ $t('admin.header.logout') }}
       </UButton>
     </template>
-  </UHeader>
+  </UPageHeader>
 </template>

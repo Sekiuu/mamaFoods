@@ -167,7 +167,7 @@ const handleConfirm = () => {
                 <div class="flex gap-2">
                     <UButton color="neutral" variant="ghost" @click="isModalOpen = false">{{ t('btn.cancel') }}
                     </UButton>
-                    <UButton color="warning" @click="handleConfirm">{{ t('btn.confirm') }}</UButton>
+                    <UButton color="warning" @click="handleConfirm">{{ t('btn.addToCart') }}</UButton>
                 </div>
             </div>
         </template>

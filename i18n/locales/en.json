@@ -232,6 +232,8 @@
         "copy": "Copy",
         "paste": "Paste",
         "back": "Back",
+        "order": "สั่งซื้อ",
+        "addToCart": "Add to Cart",
         "upload": {
             "image": "Upload Image"
         }
