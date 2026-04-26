@@ -2,7 +2,13 @@
     <div class="space-y-4">
         <h2 v-if="title" class="text-2xl font-bold">{{ title }}</h2>
 
-        <div class="grid gap-6" :class="gridClass">
+        <UAlert color="info" variant="soft" v-if="!foods || foods.length <= 0"
+        :title="$t('food.empty')" icon="i-lucide-alert-circle" 
+        :ui="{
+            title : 'text-lg font-semibold text-center',
+        }" />
+
+        <div v-else class="grid gap-6" :class="gridClass">
             <FoodCard v-for="item in foods" 
             :key="item.id" :item="item" 
             :add-to-cart="addToCart" />
