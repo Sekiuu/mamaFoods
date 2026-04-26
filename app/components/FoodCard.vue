@@ -100,7 +100,7 @@ const handleConfirm = () => {
             <UAlert color="error" variant="soft" icon="i-lucide-circle-x" title="HIDDEN" />
         </template>
 
-        <div class="flex flex-row md:flex-col">
+        <div class="flex md:flex-col items-center">
 
             <!-- ── Image: left on mobile, top on desktop ── -->
             <div
@@ -114,7 +114,7 @@ const handleConfirm = () => {
             </div>
 
             <!-- ── Content: right on mobile, below image on desktop ── -->
-            <div class="flex flex-col justify-between flex-1 py-3 pr-3 md:px-4 md:pb-4 md:pt-0 min-w-0">
+            <div class="flex flex-col justify-between flex-1 py-3 pr-3 md:px-0 md:pb-0 md:pt-0 w-full">
                 <div class="min-w-0">
                     <h3 class="font-bold text-base md:text-xl leading-tight truncate md:whitespace-normal">
                         {{ props.item.name }}
